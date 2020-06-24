@@ -1,2 +1,32 @@
-scummvm usr/games
-dists/scummvm.desktop usr/share/applications
+# run as fake dbus-service to enable switching back to application from desktop via home key
+dists/maemo/scummvm.servicewrapper usr/games/scummvm
+dists/maemo/scummvm.servicedesktop usr/share/applications/hildon/scummvm.desktop
+dists/maemo/scummvm.service usr/share/dbus-1/services
+
+# the following commented out lines are the alternative for not running scummvm as a fake service
+#dists/maemo/scummvm.wrapper usr/games/scummvm
+#dists/maemo/scummvm.desktop usr/share/applications/hildon
+dists/maemo/scummvm26.png usr/share/icons/hicolor/26x26/hildon/scummvm.png
+dists/maemo/scummvm40.png usr/share/icons/hicolor/40x40/hildon/scummvm.png
+dists/maemo/scummvm48.png usr/share/icons/hicolor/48x48/hildon/scummvm.png
+dists/maemo/scummvm64.png usr/share/icons/hicolor/64x64/hildon/scummvm.png
+icons/scummvm.xpm usr/share/icons
+#plugins/lib*.so usr/lib/scummvm
+
+##non-optified version
+#scummvm usr/games/scummvm.bin
+#dists/pred.dic usr/share/scummvm
+#gui/themes/scummclassic.zip  gui/themes/scummmodern.zip gui/themes/scummremastered.zip usr/share/scummvm
+
+# optified version (save rootfs space on N900), see also configure prefix and datadir paths above
+scummvm opt/scummvm/bin
+dists/pred.dic opt/scummvm/share
+gui/themes/scummclassic.zip  gui/themes/scummmodern.zip gui/themes/scummremastered.zip opt/scummvm/share
+backends/vkeybd/packs/vkeybd_default.zip opt/scummvm/share
+backends/vkeybd/packs/vkeybd_small.zip opt/scummvm/share
+# for optified version we can also add engine datafiles
+dists/engine-data/*.dat opt/scummvm/share
+dists/engine-data/*.zip opt/scummvm/share
+dists/engine-data/*.ccs opt/scummvm/share
+dists/engine-data/*.tbl opt/scummvm/share
+dists/engine-data/*.cpt opt/scummvm/share
