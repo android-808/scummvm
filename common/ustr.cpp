@@ -23,6 +23,7 @@
 #include "common/ustr.h"
 #include "common/memorypool.h"
 #include "common/util.h"
+#include "unicode-bidi.h"
 
 namespace Common {
 
@@ -92,6 +93,10 @@ U32String::U32String(const char *beginP, const char *endP) : _size(0), _str(_sto
 
 U32String::U32String(const String &str) : _size(0), _str(_storage) {
 	initWithCStr(str.c_str(), str.size());
+}
+
+U32String::U32String(const UnicodeBiDiText &txt) : _size(0), _str(_storage) {
+	initWithCStr(txt.visual.c_str(), txt.visual.size());
 }
 
 U32String::~U32String() {
@@ -223,6 +228,16 @@ bool U32String::contains(value_type x) const {
 	return false;
 }
 
+void U32String::insertChar(value_type c, uint32 p) {
+	assert(p <= _size);
+
+	ensureCapacity(_size + 1, true);
+	_size++;
+	for (uint32 i = _size; i > p; --i)
+		_str[i] = _str[i - 1];
+	_str[p] = c;
+}
+
 void U32String::deleteChar(uint32 p) {
 	assert(p < _size);
 
@@ -280,6 +295,16 @@ void U32String::toUppercase() {
 			_str[i] = toupper(_str[i]);
 		}
 	}
+}
+
+uint32 U32String::find(value_type x, uint32 pos) const {
+	for (uint32 i = pos; i < _size; ++i) {
+		if (_str[i] == x) {
+			return i;
+		}
+	}
+
+	return npos;
 }
 
 uint32 U32String::find(const U32String &str, uint32 pos) const {
@@ -402,7 +427,12 @@ void U32String::decRefCount(int *oldRefCount) {
 			assert(g_refCountPool);
 			g_refCountPool->freeChunk(oldRefCount);
 		}
+		// Coverity thinks that we always free memory, as it assumes
+		// (correctly) that there are cases when oldRefCount == 0
+		// Thus, DO NOT COMPILE, trick it and shut tons of false positives
+#ifndef __COVERITY__
 		delete[] _str;
+#endif
 
 		// Even though _str points to a freed memory block now,
 		// we do not change its value, because any code that calls

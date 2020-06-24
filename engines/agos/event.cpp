@@ -430,8 +430,6 @@ void AGOSEngine::delay(uint amount) {
 
 	_system->getAudioCDManager()->update();
 
-	_debugger->onFrame();
-
 	vgaPeriod = (_fastMode) ? 10 : _vgaPeriod;
 	if (getGameType() == GType_PP && getGameId() != GID_DIMP) {
 		if (vgaPeriod == 15 && _variableArray[999] == 0)
@@ -484,8 +482,6 @@ void AGOSEngine::delay(uint amount) {
 						_aboutDialog->runModal();
 					} else if (event.kbd.keycode == Common::KEYCODE_f) {
 						_fastMode = !_fastMode;
-					} else if (event.kbd.keycode == Common::KEYCODE_d) {
-						_debugger->attach();
 					}
 				}
 
@@ -522,7 +518,7 @@ void AGOSEngine::delay(uint amount) {
 			case Common::EVENT_RBUTTONUP:
 				_rightClick = true;
 				break;
-			case Common::EVENT_RTL:
+			case Common::EVENT_RETURN_TO_LAUNCHER:
 			case Common::EVENT_QUIT:
 				return;
 			case Common::EVENT_WHEELUP:

@@ -36,7 +36,7 @@ Common::Error CryOmni3DEngine_Versailles::loadGameState(int slot) {
 	return Common::kNoError;
 }
 
-Common::Error CryOmni3DEngine_Versailles::saveGameState(int slot, const Common::String &desc) {
+Common::Error CryOmni3DEngine_Versailles::saveGameState(int slot, const Common::String &desc, bool isAutosave) {
 	saveGame(_isVisiting, slot + 1, desc);
 	return Common::kNoError;
 }
@@ -45,12 +45,21 @@ Common::String CryOmni3DEngine_Versailles::getSaveFileName(bool visit, uint save
 	return Common::String::format("%s%s.%04u", _targetName.c_str(), visit ? "_visit" : "", saveNum);
 }
 
+Common::String CryOmni3DEngine_Versailles::getSaveStateName(int slot) const {
+	return Common::String::format("%s.%04u", _targetName.c_str(), slot);
+}
+
 bool CryOmni3DEngine_Versailles::canVisit() const {
 	return Common::File::exists("game0001.sav");
 }
 
-void CryOmni3DEngine_Versailles::getSavesList(bool visit, Common::StringArray &saveNames) {
+void CryOmni3DEngine_Versailles::getSavesList(bool visit, Common::StringArray &saveNames,
+        int &nextSaveNum) {
+	nextSaveNum = 1;
+	bool supportsAutoName = (_messages.size() >= 148);
+
 	char saveName[kSaveDescriptionLen + 1];
+	// Terminate saveName here forever (we don't overrun kSaveDescriptionLen)
 	saveName[kSaveDescriptionLen] = '\0';
 	Common::String pattern = Common::String::format("%s%s.????", _targetName.c_str(),
 	                         visit ? "_visit" : "");
@@ -94,9 +103,37 @@ void CryOmni3DEngine_Versailles::getSavesList(bool visit, Common::StringArray &s
 			num++;
 			Common::InSaveFile *in = _saveFileMan->openForLoading(*file);
 			if (in) {
-				if (in->read(saveName, kSaveDescriptionLen) == kSaveDescriptionLen) {
-					saveNames.push_back(saveName);
+				if (in->read(saveName, kSaveDescriptionLen) != kSaveDescriptionLen) {
+					warning("getSavesList(): Corrupted save %s", saveName);
+					delete in;
+
+					continue;
 				}
+
+				Common::String saveNameStr = saveName;
+				if (supportsAutoName && saveNameStr.hasPrefix("AUTO")) {
+					int saveNum = atoi(saveName + 4);
+					if (saveNum >= 1 && saveNum <= 9999) {
+						in->seek(436); // Go to current level
+						uint32 level = in->readUint32BE();
+
+						if (level < 8) {
+							saveNameStr = Common::String::format(_messages[146].c_str(), level);
+						} else {
+							saveNameStr = _messages[147];
+						}
+						saveNameStr += Common::String::format(" - %d", saveNum);
+						if (saveNum >= nextSaveNum) {
+							if (saveNum >= 9999) {
+								nextSaveNum = 9999;
+							} else {
+								nextSaveNum = saveNum + 1;
+							}
+						}
+					}
+				}
+
+				saveNames.push_back(saveNameStr);
 				delete in;
 			}
 		}

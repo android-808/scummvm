@@ -28,6 +28,19 @@
 
 namespace Common {
 
+uint32 WriteStream::writeStream(ReadStream *stream, uint32 dataSize) {
+	void *buf = malloc(dataSize);
+	dataSize = stream->read(buf, dataSize);
+	assert(dataSize > 0);
+	dataSize = write(buf, dataSize);
+	free(buf);
+	return dataSize;
+}
+
+uint32 WriteStream::writeStream(SeekableReadStream *stream) {
+	return writeStream(stream, stream->size());
+}
+
 void WriteStream::writeString(const String &str) {
 	write(str.c_str(), str.size());
 }
@@ -111,7 +124,7 @@ enum {
 	CR = 0x0D
 };
 
-char *SeekableReadStream::readLine(char *buf, size_t bufSize) {
+char *SeekableReadStream::readLine(char *buf, size_t bufSize, bool handleCR) {
 	assert(buf != nullptr && bufSize > 1);
 	char *p = buf;
 	size_t len = 0;
@@ -146,7 +159,7 @@ char *SeekableReadStream::readLine(char *buf, size_t bufSize) {
 		// * DOS and Windows use CRLF line breaks
 		// * Unix and OS X use LF line breaks
 		// * Macintosh before OS X used CR line breaks
-		if (c == CR) {
+		if (c == CR && handleCR) {
 			// Look at the next char -- is it LF? If not, seek back
 			c = readByte();
 
@@ -174,12 +187,12 @@ char *SeekableReadStream::readLine(char *buf, size_t bufSize) {
 	return buf;
 }
 
-String SeekableReadStream::readLine() {
+String SeekableReadStream::readLine(bool handleCR) {
 	// Read a line
 	String line;
 	while (line.lastChar() != '\n') {
 		char buf[256];
-		if (!readLine(buf, 256))
+		if (!readLine(buf, 256, handleCR))
 			break;
 		line += buf;
 	}
@@ -327,6 +340,13 @@ uint32 BufferedReadStream::read(void *dataPtr, uint32 dataSize) {
 			uint32 n = _parentStream->read(dataPtr, dataSize);
 			if (_parentStream->eos())
 				_eos = true;
+
+			// Fill the buffer from the user buffer so a seek back in
+			// the stream into the buffered area brings consistent data.
+			_bufSize = MIN(n, _realBufSize);
+			_pos = _bufSize;
+			memcpy(_buf, (byte *)dataPtr + n - _bufSize, _bufSize);
+
 			return alreadyRead + n;
 		}
 

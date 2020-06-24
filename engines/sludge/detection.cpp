@@ -44,17 +44,22 @@ const char *SludgeEngine::getGameFile() const {
 } // End of namespace Sludge
 
 static const PlainGameDescriptor sludgeGames[] = {
-	{ "sludge", "Sludge Game" },
-	{ "welcome", "Welcome Example" },
-	{ "verbcoin", "Verb Coin" },
-	{ "robinsrescue", "Robin's Rescue" },
-	{ "outoforder", "Out Of Order" },
-	{ "frasse", "Frasse and the Peas of Kejick" },
-	{ "interview", "The Interview" },
-	{ "life", "Life Flashed By"},
-	{ "tgttpoacs", "The Game That Takes Place on a Cruise Ship" },
-	{ "mandy", "Mandy Christmas Adventure" },
-	{ "cubert", "Cubert Badbone, P.I." },
+	{ "sludge",			"Sludge Game" },
+	{ "welcome",		"Welcome Example" },
+	{ "verbcoin",		"Verb Coin" },
+	{ "robinsrescue",	"Robin's Rescue" },
+	{ "outoforder",		"Out Of Order" },
+	{ "frasse",			"Frasse and the Peas of Kejick" },
+	{ "interview",		"The Interview" },
+	{ "life",			"Life Flashes By" },
+	{ "tgttpoacs",		"The Game That Takes Place on a Cruise Ship" },
+	{ "mandy",			"Mandy Christmas Adventure" },
+	{ "cubert",			"Cubert Badbone, P.I." },
+	{ "gjgagsas",		"The Game Jam Game About Games, Secrets and Stuff" },
+	{ "tsotc",			"The Secret of Tremendous Corporation" },
+	{ "nsc",			"Nathan's Second Chance" },
+	{ "atw",			"Above The Waves" },
+	{ "leptonsquest",	"Lepton's Quest" },
 	{ 0, 0 }
 };
 
@@ -82,19 +87,19 @@ public:
 		_maxScanDepth = 1;
 	}
 
-	const char *getEngineId() const {
+	const char *getEngineId() const override {
 		return "sludge";
 	}
 
-	virtual const char *getName() const {
+	const char *getName() const override {
 		return "Sludge";
 	}
 
-	virtual const char *getOriginalCopyright() const {
+	const char *getOriginalCopyright() const override {
 		return "Sludge (C) 2000-2014 Hungry Software and contributors";
 	}
 
-	virtual bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const {
+	bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override {
 		const Sludge::SludgeGameDescription *gd = (const Sludge::SludgeGameDescription *)desc;
 			if (gd) {
 				*engine = new Sludge::SludgeEngine(syst, gd);

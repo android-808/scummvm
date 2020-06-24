@@ -48,6 +48,7 @@ namespace Griffon {
 
 void GriffonEngine::title(int mode) {
 	float xofs = 0;
+	_itemyloc = 0;
 	bool exitTitle = false;
 
 	rcSrc.left = 0;
@@ -255,7 +256,6 @@ void GriffonEngine::configMenu() {
 
 	int ticks1 = _ticks;
 
-	_cloudImg->setAlpha(128, true);
 
 	do {
 		_videoBuffer->fillRect(Common::Rect(0, 0, _videoBuffer->w, _videoBuffer->h), 0);
@@ -266,14 +266,14 @@ void GriffonEngine::configMenu() {
 		rcDest.setWidth(320);
 		rcDest.setHeight(240);
 
-		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest);
+		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest, TS_ARGB(128, 255, 255, 255));
 
 		rcDest.left = 256;
 		rcDest.top = 192;
 		rcDest.setWidth(320);
 		rcDest.setHeight(240);
 
-		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest);
+		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest, TS_ARGB(128, 255, 255, 255));
 
 		configwindow->blit(*_videoBuffer);
 
@@ -466,7 +466,6 @@ void GriffonEngine::configMenu() {
 		g_system->delayMillis(10);
 	} while (!_shouldQuit && !exitMenu && _gameMode != kGameModeNewGame && _gameMode != kGameModeLoadGame);
 
-	_cloudImg->setAlpha(64, true);
 
 	configwindow->free();
 	_itemTicks = _ticks + 210;
@@ -558,7 +557,6 @@ void GriffonEngine::saveLoadNew() {
 	int ticks1 = _ticks;
 	int tickPause = _ticks + 150;
 
-	_cloudImg->setAlpha(128, true);
 
 	renderSaveStates();
 
@@ -582,14 +580,14 @@ void GriffonEngine::saveLoadNew() {
 		rcDest.setWidth(320);
 		rcDest.setHeight(240);
 
-		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest);
+		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest, TS_ARGB(128, 255, 255, 255));
 
 		rcDest.left = 256;
 		rcDest.top = 192;
 		rcDest.setWidth(320);
 		rcDest.setHeight(240);
 
-		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest);
+		_cloudImg->blit(*_videoBuffer, 0, 0, Graphics::FLIP_NONE, &rcDest, TS_ARGB(128, 255, 255, 255));
 
 		_saveLoadImg->blit(*_videoBuffer);
 
@@ -629,7 +627,7 @@ void GriffonEngine::saveLoadNew() {
 						}
 					}
 					if (lowerLock && tickPause < _ticks) {
-						if ((curCol == 1) && saveState(curRow - 1)) {
+						if ((curCol == 1) && saveGameState(curRow - 1, "", false).getCode() == Common::kNoError) {
 							_secStart += _secsInGame;
 							_secsInGame = 0;
 							lowerLock = false;
@@ -637,7 +635,7 @@ void GriffonEngine::saveLoadNew() {
 							curRow = 0;
 
 							renderSaveStates();
-						} else if ((curCol == 2) && loadState(curRow - 1)) {
+						} else if ((curCol == 2) && loadGameState(curRow - 1).getCode() == Common::kNoError) {
 
 							return;
 						}
@@ -782,7 +780,6 @@ void GriffonEngine::saveLoadNew() {
 		g_system->delayMillis(10);
 	} while (!_shouldQuit);
 
-	_cloudImg->setAlpha(64, true);
 }
 
 

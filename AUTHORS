@@ -109,6 +109,7 @@ ScummVM Team
     Director:
        Eugene Sandulenko
        Dmitry Iskrich
+       Scott Percival
        Steven Hoefel
        Tobia Tesan
 
@@ -238,6 +239,10 @@ ScummVM Team
     Pegasus:
        Matthew Hoops                - (retired)
 
+    Petka:
+       Andrei Prykhodko
+       Eugene Sandulenko
+
     Pink:
        Andrei Prykhodko
        Eugene Sandulenko
@@ -346,6 +351,29 @@ ScummVM Team
 
     Tucker:
        Gregory Montoir              - (retired)
+
+    Ultima:
+       Paul Gilbert
+       Matthew Duggan
+       Matthew Jimenez
+       Daniel c. Wuerl              - (Nuvie)
+       Eric Fry                     - (Nuvie)
+       Jeremy Newman                - (Nuvie)
+       Jonathan E. Wright           - (Nuvie)
+       Joseph Applegate             - (Nuvie)
+       Malignant Manor              - (Nuvie)
+       Markus Niemistoe             - (Nuvie)
+       Michael Fink                 - (Nuvie)
+       Pieter Luteijn               - (Nuvie)
+       Sam Matthews                 - (Nuvie)
+       Travis Howell                - (Nuvie)
+       Willem Jan Palenstijn        - (Nuvie)
+       Brian Tietz                  - (Pentagram)
+       Dominik Reichardt            - (Pentagram)
+       Max Horn                     - (Pentagram)
+       Patrick Burke                - (Pentagram)
+       Ryan Nunn                    - (Pentagram)
+       Willem Jan Palenstijn        - (Pentagram)
 
     Voyeur:
        Arnaud Boutonne
@@ -838,8 +866,8 @@ Special thanks to
    David P. Gray from Gray Design Associates for sharing the source code of
    the Hugo trilogy.
 
-   Broken Sword 2.5 team for providing sources of their engine and their
-   great support.
+   The mindFactory team for writing Broken Sword 2.5, a splendid fan-made
+   sequel, and for sharing the source code with us.
 
    Neil Dodwell and David Dew from Creative Reality for providing the source
    of Dreamweb and for their tremendous support.
@@ -858,9 +886,6 @@ Special thanks to
    Vasyl Tsvirkunov of Electronic Arts for providing the source code of the
    two Lost Files of Sherlock Holmes games. James M. Ferguson and Barry
    Duncan for their tenacious efforts to recover the sources.
-
-   The mindFactory team for writing Broken Sword 2.5, a splendid fan-made
-   sequel, and for sharing the source code with us.
 
    John Romero for sharing the source code of Hyperspace Delivery Boy! with
    us.

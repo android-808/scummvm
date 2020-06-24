@@ -38,6 +38,7 @@ namespace Speechtests {
 TestExitStatus testMale();
 TestExitStatus testFemale();
 TestExitStatus testStop();
+TestExitStatus testStopAndSpeak();
 TestExitStatus testPauseResume();
 TestExitStatus testRate();
 TestExitStatus testVolume();
@@ -65,12 +66,12 @@ public:
 	 * @see addTest()
 	 */
 	SpeechTestSuite();
-	~SpeechTestSuite() {}
-	const char *getName() const {
+	~SpeechTestSuite() override {}
+	const char *getName() const override {
 		return "Speech";
 	}
 
-	const char *getDescription() const {
+	const char *getDescription() const override {
 		return "Speech Subsystem";
 	}
 

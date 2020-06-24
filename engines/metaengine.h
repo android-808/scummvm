@@ -23,6 +23,7 @@
 #ifndef ENGINES_METAENGINE_H
 #define ENGINES_METAENGINE_H
 
+#include "common/achievements.h"
 #include "common/scummsys.h"
 #include "common/error.h"
 #include "common/array.h"
@@ -36,6 +37,7 @@ class Engine;
 class OSystem;
 
 namespace Common {
+class Keymap;
 class FSList;
 class OutSaveFile;
 class String;
@@ -45,6 +47,11 @@ typedef SeekableReadStream InSaveFile;
 
 namespace Graphics {
 struct Surface;
+}
+
+namespace GUI {
+class GuiObject;
+class OptionsContainerWidget;
 }
 
 /**
@@ -60,7 +67,7 @@ struct ExtraGuiOption {
 
 typedef Common::Array<ExtraGuiOption> ExtraGuiOptions;
 
-#define EXTENDED_SAVE_VERSION 3
+#define EXTENDED_SAVE_VERSION 4
 
 struct ExtendedSavegameHeader {
 	char id[6];
@@ -71,6 +78,7 @@ struct ExtendedSavegameHeader {
 	uint16 time;
 	uint32 playtime;
 	Graphics::Surface *thumbnail;
+	bool isAutosave;
 
 	ExtendedSavegameHeader() {
 		memset(id, 0, 6);
@@ -79,6 +87,7 @@ struct ExtendedSavegameHeader {
 		time = 0;
 		playtime = 0;
 		thumbnail = nullptr;
+		isAutosave = false;
 	}
 };
 
@@ -91,6 +100,11 @@ struct ExtendedSavegameHeader {
  * and instantiate actual Engine objects.
  */
 class MetaEngine : public PluginObject {
+private:
+	/**
+	 * Converts the current screen contents to a thumbnail, and saves it
+	 */
+	static void saveScreenThumbnail(Common::OutSaveFile *saveFile);
 public:
 	virtual ~MetaEngine() {}
 
@@ -146,6 +160,26 @@ public:
 	virtual SaveStateList listSaves(const char *target) const;
 
 	/**
+	 * Return a list of all save states associated with the given target.
+	 *
+	 * This is a wrapper around the basic listSaves virtual method, but which
+	 * has some extra logic for autosave handling
+	 *
+	 * @param target	name of a config manager target
+	 * @param saveMode	If true, getting the list for a save dialog
+	 * @return			a list of save state descriptors
+	 */
+	SaveStateList listSaves(const char *target, bool saveMode) const;
+
+	/**
+	 * Returns the slot number being used for autosaves.
+	 * @note	This should match the engine getAutosaveSlot() method
+	 */
+	virtual int getAutosaveSlot() const {
+		return 0;
+	}
+
+	/**
 	 * Return a list of extra GUI options for the specified target.
 	 * If no target is specified, all of the available custom GUI options are
 	 * Returned for the plugin (used to set default values).
@@ -160,6 +194,43 @@ public:
 	 */
 	virtual const ExtraGuiOptions getExtraGuiOptions(const Common::String &target) const {
 		return ExtraGuiOptions();
+	}
+
+	/**
+	 * Register the default values for the settings the engine uses into the
+	 * configuration manager.
+	 *
+	 * @param target    name of a config manager target
+	 */
+	virtual void registerDefaultSettings(const Common::String &target) const;
+
+	/**
+	 * Return a GUI widget container for configuring the specified target options.
+	 *
+	 * The returned widget is shown in the Engine tab in the edit game dialog.
+	 * Engines can build custom options dialogs, but by default a simple widget
+	 * allowing to configure the extra GUI options is used.
+	 *
+	 * Engines that don't want to have an Engine tab in the edit game dialog
+	 * can return nullptr.
+	 *
+	 * @param boss     the widget / dialog the returned widget is a child of
+	 * @param name     the name the returned widget must use
+	 * @param target   name of a config manager target
+	 */
+	virtual GUI::OptionsContainerWidget *buildEngineOptionsWidget(GUI::GuiObject *boss, const Common::String &name, const Common::String &target) const;
+
+	/**
+	 * Return a list of achievement descriptions for the specified target.
+	 *
+	 * The default implementation returns an empty list.
+	 *
+	 * @param target    name of a config manager target
+	 * @return          a list of achievement descriptions for an engine plugin
+	 *                  and target
+	 */
+	virtual const Common::AchievementsInfo getAchievementsInfo(const Common::String &target) const {
+		return Common::AchievementsInfo();
 	}
 
 	/**
@@ -215,6 +286,11 @@ public:
 	 * @param target		game target. If omitted, then the engine id is used
 	 */
 	virtual const char *getSavegamePattern(const char *target = nullptr) const;
+
+	/**
+	 * Return the keymap used by the target.
+	 */
+	virtual Common::Array<Common::Keymap *> initKeymaps(const char *target) const;
 
 	/** @name MetaEngineFeature flags */
 	//@{
@@ -307,11 +383,10 @@ public:
 	 * Determine whether the engine supports the specified MetaEngine feature.
 	 * Used by e.g. the launcher to determine whether to enable the "Load" button.
 	 */
-	virtual bool hasFeature(MetaEngineFeature f) const {
-		return false;
-	}
+	virtual bool hasFeature(MetaEngineFeature f) const;
 
-	static void appendExtendedSave(Common::OutSaveFile *saveFile, uint32 playtime, Common::String desc);
+	static void appendExtendedSave(Common::OutSaveFile *saveFile, uint32 playtime,
+		Common::String desc, bool isAutosave);
 	static void parseSavegameHeader(ExtendedSavegameHeader *header, SaveStateDescriptor *desc);
 	static void fillDummyHeader(ExtendedSavegameHeader *header);
 	static WARN_UNUSED_RESULT bool readSavegameHeader(Common::InSaveFile *in, ExtendedSavegameHeader *header, bool skipThumbnail = true);

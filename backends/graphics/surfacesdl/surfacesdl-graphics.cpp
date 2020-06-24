@@ -30,6 +30,7 @@
 #include "common/textconsole.h"
 #include "common/translation.h"
 #include "common/util.h"
+#include "common/file.h"
 #include "common/frac.h"
 #ifdef USE_RGB_COLOR
 #include "common/list.h"
@@ -39,19 +40,23 @@
 #include "graphics/scaler.h"
 #include "graphics/scaler/aspect.h"
 #include "graphics/surface.h"
+#include "gui/debugger.h"
 #include "gui/EventRecorder.h"
 #ifdef USE_PNG
-#include "common/file.h"
 #include "image/png.h"
+#else
+#include "image/bmp.h"
 #endif
 #ifdef USE_TTS
 #include "common/text-to-speech.h"
 #endif
 
-static const OSystem::GraphicsMode s_supportedShaders[] = {
-	{"NONE", "Normal (no shader)", 0},
-	{0, 0, 0}
-};
+// SDL surface flags which got removed in SDL2.
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+#define SDL_SRCCOLORKEY 0
+#define SDL_SRCALPHA    0
+#define SDL_FULLSCREEN  0x40000000
+#endif
 
 static const OSystem::GraphicsMode s_supportedGraphicsModes[] = {
 	{"1x", _s("Normal (no scaling)"), GFX_NORMAL},
@@ -191,23 +196,11 @@ SurfaceSdlGraphicsManager::SurfaceSdlGraphicsManager(SdlEventSource *sdlEventSou
 #endif
 	_scalerType = 0;
 
-#ifndef __SYMBIAN32__
 	_videoMode.fullscreen = ConfMan.getBool("fullscreen");
-#else
-	_videoMode.fullscreen = true;
-#endif
-
 	_videoMode.filtering = ConfMan.getBool("filtering");
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 	_videoMode.stretchMode = STRETCH_FIT;
 #endif
-
-	// the default backend has no shaders
-	// shader number 0 is the entry NONE (no shader)
-	// for an example on shader support,
-	// consult the psp2sdl backend which inherits from this class
-	_currentShader = 0;
-	_numShaders = 1;
 }
 
 SurfaceSdlGraphicsManager::~SurfaceSdlGraphicsManager() {
@@ -225,22 +218,6 @@ SurfaceSdlGraphicsManager::~SurfaceSdlGraphicsManager() {
 	free(_currentPalette);
 	free(_cursorPalette);
 	delete[] _mouseData;
-}
-
-void SurfaceSdlGraphicsManager::activateManager() {
-	SdlGraphicsManager::activateManager();
-
-	// Register the graphics manager as a event observer
-	g_system->getEventManager()->getEventDispatcher()->registerObserver(this, 10, false);
-}
-
-void SurfaceSdlGraphicsManager::deactivateManager() {
-	// Unregister the event observer
-	if (g_system->getEventManager()->getEventDispatcher()) {
-		g_system->getEventManager()->getEventDispatcher()->unregisterObserver(this);
-	}
-
-	SdlGraphicsManager::deactivateManager();
 }
 
 bool SurfaceSdlGraphicsManager::hasFeature(OSystem::Feature f) const {
@@ -415,7 +392,7 @@ OSystem::TransactionError SurfaceSdlGraphicsManager::endGFXTransaction() {
 			// OSystem_SDL::pollEvent used to update the screen change count,
 			// but actually it gives problems when a video mode was changed
 			// but OSystem_SDL::pollEvent was not called. This for example
-			// caused a crash under certain circumstances when doing an RTL.
+			// caused a crash under certain circumstances when returning to launcher.
 			// To fix this issue we update the screen change count right here.
 			_screenChangeCount++;
 		}
@@ -431,7 +408,7 @@ OSystem::TransactionError SurfaceSdlGraphicsManager::endGFXTransaction() {
 			// OSystem_SDL::pollEvent used to update the screen change count,
 			// but actually it gives problems when a video mode was changed
 			// but OSystem_SDL::pollEvent was not called. This for example
-			// caused a crash under certain circumstances when doing an RTL.
+			// caused a crash under certain circumstances when returning to launcher.
 			// To fix this issue we update the screen change count right here.
 			_screenChangeCount++;
 
@@ -464,11 +441,17 @@ OSystem::TransactionError SurfaceSdlGraphicsManager::endGFXTransaction() {
 }
 
 Graphics::PixelFormat SurfaceSdlGraphicsManager::convertSDLPixelFormat(SDL_PixelFormat *in) const {
-	return Graphics::PixelFormat(in->BytesPerPixel,
+	Graphics::PixelFormat out(in->BytesPerPixel,
 		8 - in->Rloss, 8 - in->Gloss,
 		8 - in->Bloss, 8 - in->Aloss,
 		in->Rshift, in->Gshift,
 		in->Bshift, in->Ashift);
+
+	// Workaround to SDL not providing an accurate Aloss value on some platforms.
+	if (in->Amask == 0)
+		out.aLoss = 8;
+
+	return out;
 }
 
 #ifdef USE_RGB_COLOR
@@ -572,10 +555,6 @@ void SurfaceSdlGraphicsManager::detectSupportedFormats() {
 	if (_hwScreen) {
 		// Get our currently set hardware format
 		Graphics::PixelFormat hwFormat = convertSDLPixelFormat(_hwScreen->format);
-
-		// Workaround to SDL not providing an accurate Aloss value on Mac OS X.
-		if (_hwScreen->format->Amask == 0)
-			hwFormat.aLoss = 8;
 
 		_supportedFormats.push_back(hwFormat);
 
@@ -722,8 +701,6 @@ ScalerProc *SurfaceSdlGraphicsManager::getGraphicsScalerProc(int mode) const {
 void SurfaceSdlGraphicsManager::setGraphicsModeIntern() {
 	Common::StackLock lock(_graphicsMutex);
 
-	updateShader();
-
 	ScalerProc *newScalerProc = getGraphicsScalerProc(_videoMode.mode);
 
 	if (!newScalerProc) {
@@ -755,21 +732,6 @@ void SurfaceSdlGraphicsManager::setGraphicsModeIntern() {
 int SurfaceSdlGraphicsManager::getGraphicsMode() const {
 	assert(_transactionMode == kTransactionNone);
 	return _videoMode.mode;
-}
-
-const OSystem::GraphicsMode *SurfaceSdlGraphicsManager::getSupportedShaders() const {
-	return s_supportedShaders;
-}
-
-int SurfaceSdlGraphicsManager::getShader() const {
-	return _currentShader;
-}
-
-bool SurfaceSdlGraphicsManager::setShader(int id) {
-	assert(id >= 0 && id < _numShaders);
-	_currentShader = id;
-	updateShader();
-	return true;
 }
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
@@ -923,10 +885,7 @@ static void fixupResolutionForAspectRatio(AspectRatio desiredAspectRatio, int &w
 	height = bestH;
 }
 
-bool SurfaceSdlGraphicsManager::loadGFXMode() {
-	_forceRedraw = true;
-
-#if !defined(__MAEMO__) && !defined(DINGUX) && !defined(GPH_DEVICE) && !defined(LINUXMOTO)
+void SurfaceSdlGraphicsManager::setupHardwareSize() {
 	_videoMode.overlayWidth = _videoMode.screenWidth * _videoMode.scaleFactor;
 	_videoMode.overlayHeight = _videoMode.screenHeight * _videoMode.scaleFactor;
 
@@ -940,12 +899,12 @@ bool SurfaceSdlGraphicsManager::loadGFXMode() {
 		_videoMode.overlayHeight = real2Aspect(_videoMode.overlayHeight);
 		_videoMode.hardwareHeight = real2Aspect(_videoMode.hardwareHeight);
 	}
+}
 
-// On GPH devices ALL the _videoMode.hardware... are setup in GPHGraphicsManager::loadGFXMode()
-#elif !defined(GPH_DEVICE)
-	_videoMode.hardwareWidth = _videoMode.overlayWidth;
-	_videoMode.hardwareHeight = _videoMode.overlayHeight;
-#endif
+bool SurfaceSdlGraphicsManager::loadGFXMode() {
+	_forceRedraw = true;
+
+	setupHardwareSize();
 
 	//
 	// Create the surface that contains the 8 bit game data
@@ -1184,22 +1143,16 @@ void SurfaceSdlGraphicsManager::updateScreen() {
 	internUpdateScreen();
 }
 
-void SurfaceSdlGraphicsManager::updateShader() {
-	// shader init code goes here
-	// currently only used on Vita port
-	// the user-selected shaderID should be obtained via ConfMan.getInt("shader")
-	// and the corresponding shader should then be activated here
-	// this way the user can combine any software scaling (scalers)
-	// with any hardware shading (shaders). The shaders could provide
-	// scanline masks, overlays, but could also serve for
-	// hardware-based up-scaling (sharp-bilinear-simple, etc.)
-}
-
 void SurfaceSdlGraphicsManager::internUpdateScreen() {
 	SDL_Surface *srcSurf, *origSurf;
 	int height, width;
 	ScalerProc *scalerProc;
 	int scale1;
+
+	// If there's an active debugger, update it
+	GUI::Debugger *debugger = g_engine ? g_engine->getDebugger() : nullptr;
+	if (debugger)
+		debugger->onFrame();
 
 #if !SDL_VERSION_ATLEAST(2, 0, 0)
 	// If the shake position changed, fill the dirty area with blackness
@@ -1343,7 +1296,7 @@ void SurfaceSdlGraphicsManager::internUpdateScreen() {
 
 #ifdef USE_SCALERS
 			if (_videoMode.aspectRatioCorrection && orig_dst_y < height && !_overlayVisible)
-				r->h = stretch200To240((uint8 *) _hwScreen->pixels, dstPitch, r->w, r->h, r->x, r->y, orig_dst_y * scale1, _videoMode.filtering);		
+				r->h = stretch200To240((uint8 *) _hwScreen->pixels, dstPitch, r->w, r->h, r->x, r->y, orig_dst_y * scale1, _videoMode.filtering);
 #endif
 		}
 		SDL_UnlockSurface(srcSurf);
@@ -1456,73 +1409,37 @@ bool SurfaceSdlGraphicsManager::saveScreenshot(const Common::String &filename) c
 	assert(_hwScreen != NULL);
 
 	Common::StackLock lock(_graphicsMutex);
-#ifdef USE_PNG
+
 	Common::DumpFile out;
 	if (!out.open(filename)) {
 		return false;
 	}
 
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-	SDL_Surface *rgbScreen = SDL_ConvertSurfaceFormat(_hwScreen, SDL_PIXELFORMAT_RGB24, 0);
-#else
-	// This block of code was taken mostly as-is from SDL 1.2's SDL_SaveBMP_RW
-	SDL_Surface *rgbScreen = SDL_CreateRGBSurface(SDL_SWSURFACE,
-												  _hwScreen->w,
-												  _hwScreen->h,
-												  24,
-#ifdef SCUMM_LITTLE_ENDIAN
-												  0x0000FF, 0x00FF00, 0xFF0000,
-#else
-												  0xFF0000, 0x00FF00, 0x0000FF,
-#endif
-												  0);
-	if (rgbScreen == nullptr) {
-		warning("Could not create RGB24 surface");
-		return false;
-	}
-
-	SDL_Rect bounds;
-	bounds.x = bounds.y = 0;
-	bounds.w = _hwScreen->w;
-	bounds.h = _hwScreen->h;
-	if (SDL_LowerBlit(_hwScreen, &bounds, rgbScreen, &bounds) < 0) {
-		SDL_FreeSurface(rgbScreen);
-		rgbScreen = nullptr;
-	}
-#endif
-
-	if (rgbScreen == nullptr) {
-		warning("Could not convert hardware surface to RGB24");
-		return false;
-	}
-
-	int result = SDL_LockSurface(rgbScreen);
+	int result = SDL_LockSurface(_hwScreen);
 	if (result < 0) {
 		warning("Could not lock RGB surface");
-		SDL_FreeSurface(rgbScreen);
 		return false;
 	}
 
-#ifdef SCUMM_LITTLE_ENDIAN
-	const Graphics::PixelFormat format(3, 8, 8, 8, 0, 0, 8, 16, 0);
-#else
-	const Graphics::PixelFormat format(3, 8, 8, 8, 0, 16, 8, 0, 0);
-#endif
+	Graphics::PixelFormat format = convertSDLPixelFormat(_hwScreen->format);
 	Graphics::Surface data;
-	data.init(rgbScreen->w, rgbScreen->h, rgbScreen->pitch, rgbScreen->pixels, format);
+	data.init(_hwScreen->w, _hwScreen->h, _hwScreen->pitch, _hwScreen->pixels, format);
+#ifdef USE_PNG
 	const bool success = Image::writePNG(out, data);
+#else
+	const bool success = Image::writeBMP(out, data);
+#endif
 
-	SDL_UnlockSurface(rgbScreen);
-	SDL_FreeSurface(rgbScreen);
+	SDL_UnlockSurface(_hwScreen);
 
 	return success;
-#else
-	return SDL_SaveBMP(_hwScreen, filename.c_str()) == 0;
-#endif
 }
 
 void SurfaceSdlGraphicsManager::setFullscreenMode(bool enable) {
 	Common::StackLock lock(_graphicsMutex);
+
+	if (!g_system->hasFeature(OSystem::kFeatureFullscreenMode))
+		return;
 
 	if (_oldVideoMode.setup && _oldVideoMode.fullscreen == enable)
 		return;
@@ -2517,116 +2434,24 @@ void SurfaceSdlGraphicsManager::handleResizeImpl(const int width, const int heig
 	recalculateDisplayAreas();
 }
 
-bool SurfaceSdlGraphicsManager::handleScalerHotkeys(Common::KeyCode key) {
-	// Ctrl-Alt-a toggles aspect ratio correction
-	if (key == 'a') {
-		beginGFXTransaction();
-			setFeatureState(OSystem::kFeatureAspectRatioCorrection, !_videoMode.aspectRatioCorrection);
-		endGFXTransaction();
-#ifdef USE_OSD
-		Common::String message;
-		if (_videoMode.aspectRatioCorrection)
-			message = Common::String::format("%s\n%d x %d -> %d x %d",
-				_("Enabled aspect ratio correction"),
-				_videoMode.screenWidth, _videoMode.screenHeight,
-				_hwScreen->w, _hwScreen->h
-				);
-		else
-			message = Common::String::format("%s\n%d x %d -> %d x %d",
-				_("Disabled aspect ratio correction"),
-				_videoMode.screenWidth, _videoMode.screenHeight,
-				_hwScreen->w, _hwScreen->h
-				);
-		displayMessageOnOSD(message.c_str());
-#endif
-		internUpdateScreen();
-		return true;
-	}
+void SurfaceSdlGraphicsManager::handleScalerHotkeys(int scalefactor, int scalerType) {
+	assert(scalerType >= 0 && scalerType < ARRAYSIZE(s_gfxModeSwitchTable));
 
-	// Ctrl-Alt-f toggles filtering
-	if (key == 'f') {
-		beginGFXTransaction();
-		setFeatureState(OSystem::kFeatureFilteringMode, !_videoMode.filtering);
-		endGFXTransaction();
-#ifdef USE_OSD
-		if (getFeatureState(OSystem::kFeatureFilteringMode)) {
-			displayMessageOnOSD(_("Filtering enabled"));
-		} else {
-			displayMessageOnOSD(_("Filtering disabled"));
-		}
-#endif
-		_forceRedraw = true;
-		internUpdateScreen();
-		return true;
+	int factor = CLIP(scalefactor - 1, 0, 4);
+
+	while (s_gfxModeSwitchTable[scalerType][factor] < 0) {
+		assert(factor > 0);
+		factor--;
 	}
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	// Ctrl+Alt+s cycles through scaling mode (0 to 3)
-	if (key == 's') {
-		int index = 0;
-		const OSystem::GraphicsMode *sm = s_supportedStretchModes;
-		while (sm->name) {
-			if (sm->id == _videoMode.stretchMode)
-				break;
-			sm++;
-			index++;
-		}
-		index++;
-		if (!s_supportedStretchModes[index].name)
-			index = 0;
-
-		beginGFXTransaction();
-		setStretchMode(s_supportedStretchModes[index].id);
-		endGFXTransaction();
-
-#ifdef USE_OSD
-		Common::String message = Common::String::format("%s: %s",
-			_("Stretch mode"),
-			_(s_supportedStretchModes[index].description)
-			);
-		displayMessageOnOSD(message.c_str());
-#endif
-		_forceRedraw = true;
-		internUpdateScreen();
-		return true;
-	}
+	bool sizeChanged = _videoMode.scaleFactor != factor;
 #endif
 
-	int newMode = -1;
-	int factor = _videoMode.scaleFactor - 1;
-	SDLKey sdlKey = (SDLKey)key;
-
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-	bool sizeChanged = false;
-#endif
-
-	// Increase/decrease the scale factor
-	if (sdlKey == SDLK_EQUALS || sdlKey == SDLK_PLUS || sdlKey == SDLK_MINUS ||
-		sdlKey == SDLK_KP_PLUS || sdlKey == SDLK_KP_MINUS) {
-		factor += (sdlKey == SDLK_MINUS || sdlKey == SDLK_KP_MINUS) ? -1 : +1;
-		if (0 <= factor && factor <= 3) {
-			newMode = s_gfxModeSwitchTable[_scalerType][factor];
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-			sizeChanged = true;
-#endif
-		}
-	}
-
-	const bool isNormalNumber = (SDLK_1 <= sdlKey && sdlKey <= SDLK_9);
-	const bool isKeypadNumber = (SDLK_KP1 <= sdlKey && sdlKey <= SDLK_KP9);
-	if (isNormalNumber || isKeypadNumber) {
-		_scalerType = sdlKey - (isNormalNumber ? SDLK_1 : SDLK_KP1);
-		if (_scalerType >= ARRAYSIZE(s_gfxModeSwitchTable))
-			return false;
-
-		while (s_gfxModeSwitchTable[_scalerType][factor] < 0) {
-			assert(factor > 0);
-			factor--;
-		}
-		newMode = s_gfxModeSwitchTable[_scalerType][factor];
-	}
-
+	int newMode = s_gfxModeSwitchTable[scalerType][factor];
 	if (newMode >= 0) {
+		_scalerType = scalerType;
+
 		beginGFXTransaction();
 			setGraphicsMode(newMode);
 		endGFXTransaction();
@@ -2660,58 +2485,109 @@ bool SurfaceSdlGraphicsManager::handleScalerHotkeys(Common::KeyCode key) {
 #endif
 
 		internUpdateScreen();
-
-		return true;
-	} else {
-		return false;
 	}
-}
-
-bool SurfaceSdlGraphicsManager::isScalerHotkey(const Common::Event &event) {
-	if ((event.kbd.flags & (Common::KBD_CTRL|Common::KBD_ALT)) == (Common::KBD_CTRL|Common::KBD_ALT)) {
-		const bool isNormalNumber = (Common::KEYCODE_1 <= event.kbd.keycode && event.kbd.keycode <= Common::KEYCODE_9);
-		const bool isKeypadNumber = (Common::KEYCODE_KP1 <= event.kbd.keycode && event.kbd.keycode <= Common::KEYCODE_KP9);
-		const bool isScaleKey = (event.kbd.keycode == Common::KEYCODE_EQUALS || event.kbd.keycode == Common::KEYCODE_PLUS || event.kbd.keycode == Common::KEYCODE_MINUS ||
-			event.kbd.keycode == Common::KEYCODE_KP_PLUS || event.kbd.keycode == Common::KEYCODE_KP_MINUS);
-
-		if (isNormalNumber || isKeypadNumber) {
-			int keyValue = event.kbd.keycode - (isNormalNumber ? Common::KEYCODE_1 : Common::KEYCODE_KP1);
-			if (keyValue >= ARRAYSIZE(s_gfxModeSwitchTable))
-				return false;
-		}
-		if (event.kbd.keycode == 'f')
-			return true;
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-		if (event.kbd.keycode == 's')
-			return true;
-#endif
-		return (isScaleKey || event.kbd.keycode == 'a');
-	}
-	return false;
 }
 
 bool SurfaceSdlGraphicsManager::notifyEvent(const Common::Event &event) {
-	switch ((int)event.type) {
-	case Common::EVENT_KEYDOWN:
-		// Ctrl-Alt-<key> will change the GFX mode
-		if (event.kbd.hasFlags(Common::KBD_CTRL|Common::KBD_ALT)) {
-			if (handleScalerHotkeys(event.kbd.keycode))
-				return true;
-		}
-
-		break;
-
-	case Common::EVENT_KEYUP:
-		if (isScalerHotkey(event))
-			return true;
-
-		break;
-
-	default:
-		break;
+	if (event.type != Common::EVENT_CUSTOM_BACKEND_ACTION_START) {
+		return SdlGraphicsManager::notifyEvent(event);
 	}
 
-	return SdlGraphicsManager::notifyEvent(event);
+	switch ((CustomEventAction) event.customType) {
+	case kActionToggleAspectRatioCorrection: {
+		beginGFXTransaction();
+			setFeatureState(OSystem::kFeatureAspectRatioCorrection, !_videoMode.aspectRatioCorrection);
+		endGFXTransaction();
+#ifdef USE_OSD
+		Common::String message;
+		if (_videoMode.aspectRatioCorrection)
+			message = Common::String::format("%s\n%d x %d -> %d x %d",
+			                                 _("Enabled aspect ratio correction"),
+			                                 _videoMode.screenWidth, _videoMode.screenHeight,
+			                                 _hwScreen->w, _hwScreen->h
+			);
+		else
+			message = Common::String::format("%s\n%d x %d -> %d x %d",
+			                                 _("Disabled aspect ratio correction"),
+			                                 _videoMode.screenWidth, _videoMode.screenHeight,
+			                                 _hwScreen->w, _hwScreen->h
+			);
+		displayMessageOnOSD(message.c_str());
+#endif
+		internUpdateScreen();
+		return true;
+	}
+
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	case kActionToggleFilteredScaling:
+		beginGFXTransaction();
+			setFeatureState(OSystem::kFeatureFilteringMode, !_videoMode.filtering);
+		endGFXTransaction();
+#ifdef USE_OSD
+		if (getFeatureState(OSystem::kFeatureFilteringMode)) {
+			displayMessageOnOSD(_("Filtering enabled"));
+		} else {
+			displayMessageOnOSD(_("Filtering disabled"));
+		}
+#endif
+		_forceRedraw = true;
+		internUpdateScreen();
+		return true;
+#endif
+
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	case kActionCycleStretchMode: {
+		int index = 0;
+		const OSystem::GraphicsMode *sm = s_supportedStretchModes;
+		while (sm->name) {
+			if (sm->id == _videoMode.stretchMode)
+				break;
+			sm++;
+			index++;
+		}
+		index++;
+		if (!s_supportedStretchModes[index].name)
+			index = 0;
+
+		beginGFXTransaction();
+			setStretchMode(s_supportedStretchModes[index].id);
+		endGFXTransaction();
+
+#ifdef USE_OSD
+		Common::String message = Common::String::format("%s: %s",
+		                                                _("Stretch mode"),
+		                                                _(s_supportedStretchModes[index].description)
+		);
+		displayMessageOnOSD(message.c_str());
+#endif
+		_forceRedraw = true;
+		internUpdateScreen();
+		return true;
+	}
+#endif
+
+	case kActionIncreaseScaleFactor:
+		handleScalerHotkeys(_videoMode.scaleFactor + 1, _scalerType);
+		return true;
+
+	case kActionDecreaseScaleFactor:
+		handleScalerHotkeys(_videoMode.scaleFactor - 1, _scalerType);
+		return true;
+
+	case kActionSetScaleFilter1:
+	case kActionSetScaleFilter2:
+	case kActionSetScaleFilter3:
+	case kActionSetScaleFilter4:
+	case kActionSetScaleFilter5:
+	case kActionSetScaleFilter6:
+	case kActionSetScaleFilter7:
+	case kActionSetScaleFilter8:
+		handleScalerHotkeys(_videoMode.scaleFactor, event.customType - kActionSetScaleFilter1);
+		return true;
+
+	default:
+		return SdlGraphicsManager::notifyEvent(event);
+	}
 }
 
 void SurfaceSdlGraphicsManager::notifyVideoExpose() {
@@ -2801,6 +2677,37 @@ void SurfaceSdlGraphicsManager::SDL_UpdateRects(SDL_Surface *screen, int numrect
 	SDL_RenderCopy(_renderer, _screenTexture, NULL, &viewport);
 	SDL_RenderPresent(_renderer);
 }
+
+int SurfaceSdlGraphicsManager::SDL_SetColors(SDL_Surface *surface, SDL_Color *colors, int firstcolor, int ncolors) {
+	if (surface->format->palette) {
+		return !SDL_SetPaletteColors(surface->format->palette, colors, firstcolor, ncolors) ? 1 : 0;
+	} else {
+		return 0;
+	}
+}
+
+int SurfaceSdlGraphicsManager::SDL_SetAlpha(SDL_Surface *surface, Uint32 flag, Uint8 alpha) {
+	if (SDL_SetSurfaceAlphaMod(surface, alpha)) {
+		return -1;
+	}
+
+	if (alpha == 255 || !flag) {
+		if (SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE)) {
+			return -1;
+		}
+	} else {
+		if (SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND)) {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+int SurfaceSdlGraphicsManager::SDL_SetColorKey(SDL_Surface *surface, Uint32 flag, Uint32 key) {
+	return ::SDL_SetColorKey(surface, SDL_TRUE, key) ? -1 : 0;
+}
+
 #endif // SDL_VERSION_ATLEAST(2, 0, 0)
 
 #endif

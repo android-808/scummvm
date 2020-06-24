@@ -31,6 +31,8 @@
 #include "sci/resource.h"
 #include "sci/util.h"
 
+#define SCI0_CMS_ORIGINAL_BUG		1
+
 namespace Sci {
 
 class MidiDriver_CMS;
@@ -80,20 +82,20 @@ private:
 class CMSVoice_V0 : public CMSVoice {
 public:
 	CMSVoice_V0(uint8 id, MidiDriver_CMS *driver, CMSEmulator *cms, SciSpan<const uint8>& patchData);
-	virtual ~CMSVoice_V0() {}
+	~CMSVoice_V0() override {}
 
-	void noteOn(int note, int);
-	void noteOff();
-	void stop();
-	void programChange(int program);
+	void noteOn(int note, int) override;
+	void noteOff() override;
+	void stop() override;
+	void programChange(int program) override;
 
-	void update();
+	void update() override;
 
-	void reset();
-	void setPanMask(uint8 mask);
+	void reset() override;
+	void setPanMask(uint8 mask) override;
 
 private:
-	void recalculateFrequency(uint8 &frequency, uint8 &octave);
+	void recalculateFrequency(uint8 &frequency, uint8 &octave) override;
 	void recalculateEnvelopeLevels();
 	void selectEnvelope(int id);
 
@@ -115,6 +117,9 @@ private:
 	uint8 _envSLI;
 	uint8 _envPAC;
 	uint8 _envPA;
+#ifdef SCI0_CMS_ORIGINAL_BUG
+	static uint8  _envAR1;
+#endif
 
 	uint8 _envNote;
 	uint8 _envSSL;
@@ -143,18 +148,18 @@ private:
 class CMSVoice_V1 : public CMSVoice {
 public:
 	CMSVoice_V1(uint8 id, MidiDriver_CMS *driver, CMSEmulator *cms, SciSpan<const uint8>& patchData);
-	virtual ~CMSVoice_V1() {}
+	~CMSVoice_V1() override {}
 
-	void noteOn(int note, int velocity);
-	void noteOff();
-	void stop();
-	void programChange(int program);
-	void pitchWheel();
+	void noteOn(int note, int velocity) override;
+	void noteOff() override;
+	void stop() override;
+	void programChange(int program) override;
+	void pitchWheel() override;
 
-	void update();
+	void update() override;
 
 private:
-	void recalculateFrequency(uint8 &frequency, uint8 &octave);
+	void recalculateFrequency(uint8 &frequency, uint8 &octave) override;
 
 	void updateVoiceAmplitude();
 	void setupVoiceAmplitude();
@@ -180,23 +185,23 @@ public:
 
 public:
 	MidiDriver_CMS(Audio::Mixer *mixer, ResourceManager *resMan, SciVersion version);
-	~MidiDriver_CMS();
+	~MidiDriver_CMS() override;
 
-	int open();
-	void close();
+	int open() override;
+	void close() override;
 
-	void send(uint32 b);
-	uint32 property(int prop, uint32 param);
+	void send(uint32 b) override;
+	uint32 property(int prop, uint32 param) override;
 
 	void initTrack(SciSpan<const byte>& header);
 
-	void onTimer();
+	void onTimer() override;
 
-	MidiChannel *allocateChannel() { return 0; }
-	MidiChannel *getPercussionChannel() { return 0; }
+	MidiChannel *allocateChannel() override { return 0; }
+	MidiChannel *getPercussionChannel() override { return 0; }
 
-	bool isStereo() const { return true; }
-	int getRate() const { return _rate; }
+	bool isStereo() const override { return true; }
+	int getRate() const override { return _rate; }
 
 private:
 	void noteOn(int channelNr, int note, int velocity);
@@ -213,7 +218,7 @@ private:
 	int findVoiceBasic(int channelNr);
 
 	void writeToChip(int chip, int address, int data);
-	void generateSamples(int16 *buffer, int len);
+	void generateSamples(int16 *buffer, int len) override;
 
 	struct Channel {
 		Channel() : program(0), volume(0), pan(0x40), hold(0), missingVoices(0), lastVoiceUsed(0), pitchWheel(0x2000), isValid(true) {}
@@ -294,9 +299,16 @@ const int CMSVoice::_frequencyTable[48] = {
 	242, 246, 250, 253
 };
 
+#ifdef SCI0_CMS_ORIGINAL_BUG
+uint8 CMSVoice_V0::_envAR1 = 0;
+#endif
+
 CMSVoice_V0::CMSVoice_V0(uint8 id, MidiDriver_CMS* driver, CMSEmulator *cms, SciSpan<const uint8>& patchData) : CMSVoice(id, driver, cms, patchData), _envState(kReady), _currentLevel(0), _strMask(0),
 	_envAR(0), _envTL(0), _envDR(0), _envSL(0), _envRR(0), _envSLI(0), _vbrOn(false), _vbrSteps(0), _vbrState(0), _vbrMod(0), _vbrCur(0), _isSecondary(id > 7),
 	_vbrPhase(0), _transOct(0), _transFreq(0), _envPAC(0), _envPA(0), _panMask(_id & 1 ? 0xF0 : 0x0F), _envSSL(0), _envNote(0xFF), _updateCMS(false) {
+#ifdef SCI0_CMS_ORIGINAL_BUG
+	_envAR1 = 0;
+#endif
 }
 
 void CMSVoice_V0::noteOn(int note, int) {
@@ -399,8 +411,15 @@ void CMSVoice_V0::update() {
 			--_envPAC;
 			break;
 		} else {
+#ifdef SCI0_CMS_ORIGINAL_BUG
+			// This is bugged in two ways. The attack rate value is misinterpreted as a int8 for the comparison (the only place in the code
+			// where it does that). And it always uses the attack rate of voice no. 1 as a modifier instead of the voice's own attack rate.
+			// Keeping these bugs will result in faithful audio. It probably even sounds as intended, since the sequencer will have likely
+			// suffered from the same bug and calculated the deltas based on that...
+			_currentLevel = ((_currentLevel >> 1) > (int8)_envAR)?((_currentLevel >> 1) - _envAR1) & 0xFF : (_envAR - _envAR1) & 0xFF;
+#else
 			_currentLevel = ((_currentLevel >> 1) > _envAR) ? ((_currentLevel >> 1) - _envAR) : 0;
-			//_currentLevel = ((_currentLevel >> 1) > (int8)_envAR) ? ((_currentLevel >> 1) - _envAR1) & 0xFF : (_envAR - _envAR1) & 0xFF;
+#endif
 			_envState = kAttack;
 		}
 		// fall through
@@ -539,6 +558,10 @@ void CMSVoice_V0::selectEnvelope(int id) {
 	_vbrCur = _vbrMod;
 	_vbrState = _vbrSteps & 0x0F;
 	_vbrPhase = 0;
+#ifdef SCI0_CMS_ORIGINAL_BUG
+	if (_id == 1)
+		_envAR1 = _envAR;
+#endif
 }
 
 const uint8 CMSVoice_V0::_volumeTable[176] = {
@@ -1296,18 +1319,18 @@ class MidiPlayer_CMS : public MidiPlayer {
 public:
 	MidiPlayer_CMS(SciVersion version) : MidiPlayer(version), _filesMissing(false) {}
 
-	int open(ResourceManager *resMan);
-	void close();
+	int open(ResourceManager *resMan) override;
+	void close() override;
 
-	void initTrack(SciSpan<const byte>& header);
+	void initTrack(SciSpan<const byte>& header) override;
 
-	bool hasRhythmChannel() const { return false; }
-	byte getPlayId() const { return _version > SCI_VERSION_0_LATE ? 9 : 4; }
-	int getPolyphony() const { return 12; }
+	bool hasRhythmChannel() const override { return false; }
+	byte getPlayId() const override { return _version > SCI_VERSION_0_LATE ? 9 : 4; }
+	int getPolyphony() const override { return 12; }
 
-	void playSwitch(bool play) { _driver->property(MidiDriver_CMS::MIDI_PROP_PLAYSWITCH, play ? 1 : 0); }
+	void playSwitch(bool play) override { _driver->property(MidiDriver_CMS::MIDI_PROP_PLAYSWITCH, play ? 1 : 0); }
 
-	const char *reportMissingFiles() { return _filesMissing ? _requiredFiles : 0; }
+	const char *reportMissingFiles() override { return _filesMissing ? _requiredFiles : 0; }
 
 private:
 	bool _filesMissing;

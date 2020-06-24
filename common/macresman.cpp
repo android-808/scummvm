@@ -52,7 +52,7 @@ MacResManager::MacResManager() {
 
 	_mode = kResForkNone;
 
-	_resForkOffset = 0;
+	_resForkOffset = -1;
 	_resForkSize = 0;
 
 	_dataOffset = 0;
@@ -62,8 +62,6 @@ MacResManager::MacResManager() {
 	_resMap.reset();
 	_resTypes = nullptr;
 	_resLists = nullptr;
-
-	close();
 }
 
 MacResManager::~MacResManager() {
@@ -164,7 +162,8 @@ bool MacResManager::open(const String &fileName) {
 	if (file->open(fileName)) {
 		_baseFileName = fileName;
 
-		// FIXME: Is this really needed?
+		// Maybe file is in MacBinary but without .bin extension?
+		// Check it here
 		if (isMacBinary(*file)) {
 			file->seek(0);
 			if (loadFromMacBinary(*file))
@@ -717,6 +716,39 @@ String MacResManager::disassembleAppleDoubleName(String name, bool *isAppleDoubl
 	}
 
 	return name;
+}
+
+void MacResManager::dumpRaw() {
+	byte *data = nullptr;
+	uint dataSize = 0;
+	Common::DumpFile out;
+
+	for (int i = 0; i < _resMap.numTypes; i++) {
+		for (int j = 0; j < _resTypes[i].items; j++) {
+			_stream->seek(_dataOffset + _resLists[i][j].dataOffset);
+			uint32 len = _stream->readUint32BE();
+
+			if (dataSize < len) {
+				free(data);
+				data = (byte *)malloc(len);
+				dataSize = len;
+			}
+
+			Common::String filename = Common::String::format("./dumps/%s-%s-%d", _baseFileName.c_str(), tag2str(_resTypes[i].id), j);
+			_stream->read(data, len);
+
+			if (!out.open(filename)) {
+				warning("MacResManager::dumpRaw(): Can not open dump file %s", filename.c_str());
+				return;
+			}
+
+			out.write(data, len);
+
+			out.flush();
+			out.close();
+
+		}
+	}
 }
 
 } // End of namespace Common

@@ -258,9 +258,9 @@ public:
 
 	DetectedGames detectGames(const Common::FSList &fslist) const override;
 
-	virtual Common::Error createInstance(OSystem *syst, Engine **engine) const;
+	virtual Common::Error createInstance(OSystem *syst, Engine **engine) const override;
 
-	virtual const ExtraGuiOptions getExtraGuiOptions(const Common::String &target) const;
+	virtual const ExtraGuiOptions getExtraGuiOptions(const Common::String &target) const override;
 
 protected:
 	// To be implemented by subclasses
@@ -317,7 +317,7 @@ protected:
 	bool getFileProperties(const Common::FSNode &parent, const FileMap &allFiles, const ADGameDescription &game, const Common::String fname, FileProperties &fileProps) const;
 
 	/** Convert an AD game description into the shared game description format */
-	DetectedGame toDetectedGame(const ADDetectedGame &adGame) const;
+	virtual DetectedGame toDetectedGame(const ADDetectedGame &adGame) const;
 };
 
 #endif

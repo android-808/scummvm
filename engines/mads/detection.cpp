@@ -30,7 +30,6 @@
 #include "engines/advancedDetector.h"
 #include "common/system.h"
 #include "common/translation.h"
-#include "graphics/colormasks.h"
 #include "graphics/surface.h"
 #include "mads/events.h"
 #include "mads/game.h"
@@ -138,7 +137,7 @@ static const ADExtraGuiOptionsMap optionsList[] = {
 		}
 	},*/
 
-	#ifdef USE_TTS
+#ifdef USE_TTS
 	{
 		GAMEOPTION_TTS_NARRATOR,
 		{
@@ -148,7 +147,7 @@ static const ADExtraGuiOptionsMap optionsList[] = {
 			false
 		}
 	},
-	#endif
+#endif
 
 	AD_EXTRA_GUI_OPTIONS_TERMINATOR
 };
@@ -159,24 +158,24 @@ public:
 		_maxScanDepth = 3;
 	}
 
-	virtual const char *getEngineId() const {
+	const char *getEngineId() const override {
 		return "mads";
 	}
 
-	virtual const char *getName() const {
+	const char *getName() const override {
 		return "MADS";
 	}
 
-	virtual const char *getOriginalCopyright() const {
+	const char *getOriginalCopyright() const override {
 		return "MADS (C) Microprose";
 	}
 
-	virtual bool hasFeature(MetaEngineFeature f) const;
-	virtual bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const;
-	virtual SaveStateList listSaves(const char *target) const;
-	virtual int getMaximumSaveSlot() const;
-	virtual void removeSaveState(const char *target, int slot) const;
-	SaveStateDescriptor querySaveMetaInfos(const char *target, int slot) const;
+	bool hasFeature(MetaEngineFeature f) const override;
+	bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+	SaveStateList listSaves(const char *target) const override;
+	int getMaximumSaveSlot() const override;
+	void removeSaveState(const char *target, int slot) const override;
+	SaveStateDescriptor querySaveMetaInfos(const char *target, int slot) const override;
 };
 
 bool MADSMetaEngine::hasFeature(MetaEngineFeature f) const {
@@ -191,7 +190,7 @@ bool MADSMetaEngine::hasFeature(MetaEngineFeature f) const {
 
 bool MADS::MADSEngine::hasFeature(EngineFeature f) const {
 	return
-		(f == kSupportsRTL) ||
+		(f == kSupportsReturnToLauncher) ||
 		(f == kSupportsLoadingDuringRuntime) ||
 		(f == kSupportsSavingDuringRuntime);
 }

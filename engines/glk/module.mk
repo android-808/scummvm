@@ -26,10 +26,7 @@ MODULE_OBJS := \
 	window_graphics.o \
 	window_pair.o \
 	window_text_buffer.o \
-	window_text_grid.o
-
-ifdef ENABLE_GLK_ADRIFT
-MODULE_OBJS += \
+	window_text_grid.o \
 	adrift/adrift.o \
 	adrift/detection.o \
 	adrift/os_glk.o \
@@ -57,20 +54,12 @@ MODULE_OBJS += \
 	adrift/serialization.o \
 	adrift/sxfile.o \
 	adrift/sxglob.o \
-	adrift/sxutils.o
-endif
-
-ifdef ENABLE_GLK_ADVSYS
-MODULE_OBJS += \
+	adrift/sxutils.o \
 	advsys/advsys.o \
 	advsys/detection.o \
 	advsys/game.o \
 	advsys/glk_interface.o \
-	advsys/vm.o
-endif
-
-ifdef ENABLE_GLK_AGT
-MODULE_OBJS += \
+	advsys/vm.o \
 	agt/agil.o \
 	agt/agt.o \
 	agt/agtread.o \
@@ -91,11 +80,7 @@ MODULE_OBJS += \
 	agt/savegame.o \
 	agt/token.o \
 	agt/util.o \
-	agt/vars.o
-endif
-
-ifdef ENABLE_GLK_ALAN2
-MODULE_OBJS += \
+	agt/vars.o \
 	alan2/alan2.o \
 	alan2/detection.o \
 	alan2/alan_version.o \
@@ -112,11 +97,7 @@ MODULE_OBJS += \
 	alan2/rules.o \
 	alan2/stack.o \
 	alan2/sysdep.o \
-	alan2/types.o
-endif
-
-ifdef ENABLE_GLK_ALAN3
-MODULE_OBJS += \
+	alan2/types.o \
 	alan3/acode.o \
 	alan3/act.o \
 	alan3/actor.o \
@@ -164,11 +145,7 @@ MODULE_OBJS += \
 	alan3/syserr.o \
 	alan3/types.o \
 	alan3/utils.o \
-	alan3/word.o
-endif
-
-ifdef ENABLE_GLK_ARCHETYPE
-MODULE_OBJS += \
+	alan3/word.o \
 	archetype/archetype.o \
 	archetype/array.o \
 	archetype/crypt.o \
@@ -188,39 +165,23 @@ MODULE_OBJS += \
 	archetype/string.o \
 	archetype/sys_object.o \
 	archetype/timestamp.o \
-	archetype/token.o
-endif
-
-ifdef ENABLE_GLK_FROTZ
-MODULE_OBJS += \
-	frotz/bitmap_font.o \
-	frotz/config.o \
-	frotz/detection.o \
-	frotz/frotz.o \
-	frotz/glk_interface.o \
-	frotz/mem.o \
-	frotz/pics.o \
-	frotz/pics_decoder.o \
-	frotz/processor.o \
-	frotz/processor_buffer.o \
-	frotz/processor_input.o \
-	frotz/processor_maths.o \
-	frotz/processor_mem.o \
-	frotz/processor_objects.o \
-	frotz/processor_screen.o \
-	frotz/processor_streams.o \
-	frotz/processor_table.o \
-	frotz/processor_text.o \
-	frotz/processor_variables.o \
-	frotz/processor_windows.o \
-	frotz/quetzal.o \
-	frotz/screen.o \
-	frotz/sound_folder.o \
-	frotz/windows.o
-endif
-
-ifdef ENABLE_GLK_GLULXE
-MODULE_OBJS += \
+	archetype/token.o \
+	comprehend/charset.o \
+	comprehend/comprehend.o \
+	comprehend/debugger.o \
+	comprehend/debugger_dumper.o \
+	comprehend/detection.o \
+	comprehend/dictionary.o \
+	comprehend/draw_surface.o \
+	comprehend/file_buf.o \
+	comprehend/game.o \
+	comprehend/game_cc.o \
+	comprehend/game_data.o \
+	comprehend/game_oo.o \
+	comprehend/game_tm.o \
+	comprehend/game_tr.o \
+	comprehend/opcode_map.o \
+	comprehend/pics.o \
 	glulxe/accel.o \
 	glulxe/detection.o \
 	glulxe/exec.o \
@@ -234,11 +195,7 @@ MODULE_OBJS += \
 	glulxe/search.o \
 	glulxe/serial.o \
 	glulxe/string.o \
-	glulxe/vm.o
-endif
-
-ifdef ENABLE_GLK_HUGO
-MODULE_OBJS += \
+	glulxe/vm.o \
 	hugo/detection.o \
 	hugo/heexpr.o \
 	hugo/heglk.o \
@@ -251,11 +208,7 @@ MODULE_OBJS += \
 	hugo/heset.o \
 	hugo/htokens.o \
 	hugo/hugo.o \
-	hugo/stringfn.o
-endif
-
-ifdef ENABLE_GLK_JACL
-MODULE_OBJS += \
+	hugo/stringfn.o \
 	jacl/detection.o \
 	jacl/display.o \
 	jacl/encapsulate.o \
@@ -271,28 +224,16 @@ MODULE_OBJS += \
 	jacl/logging.o \
 	jacl/parser.o \
 	jacl/resolvers.o \
-	jacl/utils.o
-endif
-
-ifdef ENABLE_GLK_LEVEL9
-MODULE_OBJS += \
+	jacl/utils.o \
 	level9/bitmap.o \
 	level9/detection.o \
 	level9/level9.o \
 	level9/level9_main.o \
-	level9/os_glk.o
-endif
-
-ifdef ENABLE_GLK_MAGNETIC
-MODULE_OBJS += \
+	level9/os_glk.o \
 	magnetic/detection.o \
 	magnetic/emu.o \
 	magnetic/glk.o \
-	magnetic/magnetic.o
-endif
-
-ifdef ENABLE_GLK_QUEST
-MODULE_OBJS += \
+	magnetic/magnetic.o \
 	quest/detection.o \
 	quest/geas_file.o \
 	quest/geas_glk.o \
@@ -302,17 +243,9 @@ MODULE_OBJS += \
 	quest/quest.o \
 	quest/read_file.o \
 	quest/string.o \
-	quest/streams.o
-endif
-
-ifdef ENABLE_GLK_SCOTT
-MODULE_OBJS += \
+	quest/streams.o \
 	scott/detection.o \
-	scott/scott.o
-endif
-
-ifdef ENABLE_GLK_TADS
-MODULE_OBJS += \
+	scott/scott.o \
 	tads/detection.o \
 	tads/os_banners.o \
 	tads/os_buffer.o \
@@ -353,8 +286,31 @@ MODULE_OBJS += \
 	tads/tads2/tokenizer_hash.o \
 	tads/tads2/vocabulary.o \
 	tads/tads2/vocabulary_parser.o \
-	tads/tads3/tads3.o
-endif
+	tads/tads3/tads3.o \
+	zcode/bitmap_font.o \
+	zcode/config.o \
+	zcode/detection.o \
+	zcode/zcode.o \
+	zcode/glk_interface.o \
+	zcode/mem.o \
+	zcode/pics.o \
+	zcode/pics_decoder.o \
+	zcode/processor.o \
+	zcode/processor_buffer.o \
+	zcode/processor_input.o \
+	zcode/processor_maths.o \
+	zcode/processor_mem.o \
+	zcode/processor_objects.o \
+	zcode/processor_screen.o \
+	zcode/processor_streams.o \
+	zcode/processor_table.o \
+	zcode/processor_text.o \
+	zcode/processor_variables.o \
+	zcode/processor_windows.o \
+	zcode/quetzal.o \
+	zcode/screen.o \
+	zcode/sound_folder.o \
+	zcode/windows.o
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_GLK), DYNAMIC_PLUGIN)

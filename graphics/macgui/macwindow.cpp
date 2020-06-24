@@ -26,12 +26,13 @@
 #include "graphics/macgui/macfontmanager.h"
 #include "graphics/macgui/macwindowmanager.h"
 #include "graphics/macgui/macwindow.h"
+#include "graphics/macgui/macwidget.h"
 #include "image/bmp.h"
 
 namespace Graphics {
 
 BaseMacWindow::BaseMacWindow(int id, bool editable, MacWindowManager *wm) :
-		_id(id), _editable(editable), _wm(wm) {
+	MacWidget(nullptr, 0, 0, 0, 0, wm, true), _id(id), _editable(editable) {
 	_callback = 0;
 	_dataPtr = 0;
 
@@ -42,7 +43,6 @@ BaseMacWindow::BaseMacWindow(int id, bool editable, MacWindowManager *wm) :
 
 MacWindow::MacWindow(int id, bool scrollable, bool resizable, bool editable, MacWindowManager *wm) :
 		BaseMacWindow(id, editable, wm), _scrollable(scrollable), _resizable(resizable) {
-	_active = false;
 	_borderIsDirty = true;
 
 	_pattern = 0;
@@ -62,9 +62,37 @@ MacWindow::MacWindow(int id, bool scrollable, bool resizable, bool editable, Mac
 	_closeable = false;
 
 	_borderWidth = kBorderWidth;
+
+	_composeSurface = new Graphics::ManagedSurface();
 }
 
 MacWindow::~MacWindow() {
+	if (_composeSurface)
+		_composeSurface->free();
+
+	delete _composeSurface;
+}
+
+static const byte noborderData[3][3] = {
+	{ 0, 1, 0 },
+	{ 1, 0, 1 },
+	{ 0, 1, 0 },
+};
+
+void MacWindow::disableBorder() {
+	Graphics::TransparentSurface *noborder = new Graphics::TransparentSurface();
+	noborder->create(3, 3, noborder->getSupportedPixelFormat());
+	uint32 colorBlack = noborder->getSupportedPixelFormat().RGBToColor(0, 0, 0);
+	uint32 colorPink = noborder->getSupportedPixelFormat().RGBToColor(255, 0, 255);
+
+	for (int y = 0; y < 3; y++)
+		for (int x = 0; x < 3; x++)
+			*((uint32 *)noborder->getBasePtr(x, y)) = noborderData[y][x] ? colorBlack : colorPink;
+
+	setBorder(noborder, true);
+
+	Graphics::TransparentSurface *noborder2 = new Graphics::TransparentSurface(*noborder, true);
+	setBorder(noborder2, false);
 }
 
 const Font *MacWindow::getTitleFont() {
@@ -72,10 +100,8 @@ const Font *MacWindow::getTitleFont() {
 }
 
 void MacWindow::setActive(bool active) {
-	if (active == _active)
-		return;
+	MacWidget::setActive(active);
 
-	_active = active;
 	_borderIsDirty = true;
 }
 
@@ -93,8 +119,8 @@ void MacWindow::resize(int w, int h) {
 
 	_borderSurface.free();
 	_borderSurface.create(w, h, PixelFormat::createFormatCLUT8());
-	_composeSurface.free();
-	_composeSurface.create(w, h, PixelFormat::createFormatCLUT8());
+	_composeSurface->free();
+	_composeSurface->create(w, h, PixelFormat::createFormatCLUT8());
 
 	_dims.setWidth(w);
 	_dims.setHeight(h);
@@ -130,7 +156,7 @@ void MacWindow::setBackgroundPattern(int pattern) {
 	_contentIsDirty = true;
 }
 
-bool MacWindow::draw(ManagedSurface *g, bool forceRedraw) {
+bool MacWindow::draw(bool forceRedraw) {
 	if (!_borderIsDirty && !_contentIsDirty && !forceRedraw)
 		return false;
 
@@ -140,14 +166,24 @@ bool MacWindow::draw(ManagedSurface *g, bool forceRedraw) {
 	_contentIsDirty = false;
 
 	// Compose
-	_composeSurface.blitFrom(_surface, Common::Rect(0, 0, _surface.w - 2, _surface.h - 2), Common::Point(2, 2));
-	_composeSurface.transBlitFrom(_borderSurface, kColorGreen);
-
-	g->transBlitFrom(_composeSurface, _composeSurface.getBounds(), Common::Point(_dims.left - 2, _dims.top - 2), kColorGreen2);
+	_composeSurface->blitFrom(_surface, Common::Rect(0, 0, _surface.w - 2, _surface.h - 2), Common::Point(2, 2));
+	_composeSurface->transBlitFrom(_borderSurface, kColorGreen);
 
 	return true;
 }
 
+bool MacWindow::draw(ManagedSurface *g, bool forceRedraw) {
+	if (!draw(forceRedraw))
+		return false;
+
+	g->transBlitFrom(*_composeSurface, _composeSurface->getBounds(), Common::Point(_dims.left - 2, _dims.top - 2), kColorGreen2);
+
+	return true;
+}
+
+void MacWindow::blit(ManagedSurface *g, Common::Rect &dest) {
+	g->transBlitFrom(*_composeSurface, _composeSurface->getBounds(), dest, kColorGreen2);
+}
 
 #define ARROW_W 12
 #define ARROW_H 6
@@ -158,18 +194,6 @@ const int arrowPixels[ARROW_H][ARROW_W] = {
 		{0,0,1,1,1,1,1,1,1,1,0,0},
 		{0,1,1,1,1,1,1,1,1,1,1,0},
 		{1,1,1,1,1,1,1,1,1,1,1,1}};
-
-int localColorWhite, localColorBlack;
-
-static void drawPixelInverted(int x, int y, int color, void *data) {
-	ManagedSurface *surface = (ManagedSurface *)data;
-
-	if (x >= 0 && x < surface->w && y >= 0 && y < surface->h) {
-		byte *p = (byte *)surface->getBasePtr(x, y);
-
-		*p = *p == localColorWhite ? localColorBlack : localColorWhite;
-	}
-}
 
 void MacWindow::updateInnerDims() {
 	if (_dims.isEmpty())
@@ -268,10 +292,7 @@ void MacWindow::drawSimpleBorder(ManagedSurface *g) {
 				int ry2 = ry1 + _dims.height() * _scrollSize;
 				Common::Rect rr(rx1, ry1, rx2, ry2);
 
-				localColorWhite = _wm->_colorWhite;
-				localColorBlack = _wm->_colorBlack;
-
-				Graphics::drawFilledRect(rr, _wm->_colorBlack, drawPixelInverted, g);
+				Graphics::drawFilledRect(rr, _wm->_colorBlack, Graphics::macInvertPixel, g);
 			}
 		}
 		if (closeable) {
@@ -458,6 +479,11 @@ bool MacWindow::processEvent(Common::Event &event) {
 
 	switch (event.type) {
 	case Common::EVENT_MOUSEMOVE:
+		if (_wm->_mouseDown && _wm->_hoveredWidget && !_wm->_hoveredWidget->_dims.contains(event.mouse.x, event.mouse.y)) {
+			_wm->_hoveredWidget->setActive(false);
+			_wm->_hoveredWidget = nullptr;
+		}
+
 		if (_beingDragged) {
 			_dims.translate(event.mouse.x - _draggedX, event.mouse.y - _draggedY);
 			updateInnerDims();
@@ -506,11 +532,33 @@ bool MacWindow::processEvent(Common::Event &event) {
 	case Common::EVENT_LBUTTONUP:
 		_beingDragged = false;
 		_beingResized = false;
+		_wm->_mouseDownWidget = nullptr;
 
 		setHighlight(kBorderNone);
 		break;
+
+	case Common::EVENT_KEYDOWN:
+		if (!_editable && !(_wm->getActiveWidget() && _wm->getActiveWidget()->isEditable()))
+			return false;
+
+		if (_wm->getActiveWidget())
+			return _wm->getActiveWidget()->processEvent(event);
+
+		return false;
+
 	default:
 		return false;
+	}
+
+	MacWidget *w = _wm->_mouseDownWidget ? _wm->_mouseDownWidget : findEventHandler(event, _dims.left, _dims.top);
+	if (w && w != this) {
+		_wm->_hoveredWidget = w;
+
+		if (event.type == Common::EVENT_LBUTTONDOWN)
+			_wm->_mouseDownWidget = w;
+
+		if (w->processEvent(event))
+			return true;
 	}
 
 	if (_callback)
@@ -519,4 +567,4 @@ bool MacWindow::processEvent(Common::Event &event) {
 		return false;
 }
 
-} // End of namespace Wage
+} // End of namespace Graphics

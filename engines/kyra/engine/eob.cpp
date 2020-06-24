@@ -61,8 +61,14 @@ Common::Error EoBEngine::init() {
 	initStaticResource();
 
 	for (int i = 0; i < ARRAYSIZE(_titleConfig); ++i) {
-		if (_flags.platform == _titleConfig[i].platform)
+		if (_flags.platform == _titleConfig[i].platform && _flags.lang == _titleConfig[i].lang)
 			_ttlCfg = &_titleConfig[i];
+	}
+	if (!_ttlCfg) {
+		for (int i = 0; i < ARRAYSIZE(_titleConfig); ++i) {
+			if (_flags.platform == _titleConfig[i].platform && _titleConfig[i].lang == Common::UNK_LANG)
+				_ttlCfg = &_titleConfig[i];
+		}
 	}
 	assert(_ttlCfg);
 
@@ -438,7 +444,7 @@ void EoBEngine::drawDoorIntern(int type, int index, int x, int y, int w, int wal
 	case 4:
 	case 5:
 	case 6:
-		y = _dscDoorY6[mDim] - shp[1];
+		y = _dscDoorY7[mDim] - shp[1];
 		d1 = _dscDoorCoordsExt[index << 1] >> 3;
 		d2 = _dscDoorCoordsExt[(index << 1) + 1] >> 3;
 		if (_shpDmX1 > d1)

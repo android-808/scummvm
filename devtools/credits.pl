@@ -727,6 +727,7 @@ begin_credits("Credits");
 			begin_section("Director");
 				add_person("Eugene Sandulenko", "sev", "");
 				add_person("Dmitry Iskrich", "", "");
+				add_person("Scott Percival", "moralrecordings", "");
 				add_person("Steven Hoefel", "", "");
 				add_person("Tobia Tesan", "", "");
 			end_section();
@@ -807,6 +808,12 @@ begin_credits("Credits");
 				add_person("Eric Fry", "yuv422", "");
 			end_section();
 
+			begin_section("Kingdom");
+				add_person("Arnaud Boutonn&eacute;", "Strangerke", "");
+				add_person("Thomas Fach-Pedersen", "madmoose", "");
+				add_person("Hein-Pieter van Braam-Stewart", "TMM", "");
+			end_section();
+
 			begin_section("Kyra");
 				add_person("Torbj&ouml;rn Andersson", "eriktorbjorn", "VQA Player");
 				add_person("Oystein Eftevaag", "vinterstum", "");
@@ -882,6 +889,11 @@ begin_credits("Credits");
 
 			begin_section("Pegasus");
 				add_person("Matthew Hoops", "clone2727", "(retired)");
+			end_section();
+
+            begin_section("Petka");
+				add_person("Andrei Prykhodko", "whiterandrek", "");
+				add_person("Eugene Sandulenko", "sev", "");
 			end_section();
 
 			begin_section("Pink");
@@ -1011,6 +1023,32 @@ begin_credits("Credits");
 
 			begin_section("Tucker");
 				add_person("Gregory Montoir", "cyx", "(retired)");
+			end_section();
+
+			begin_section("Ultima");
+				add_person("Paul Gilbert", "dreammaster", "");
+				add_person("Matthew Duggan", "stauff", "");
+				add_person("Matthew Jimenez", "OMGPizzaGuy", "");
+
+				add_person("Daniel c. W&uuml;rl", "dwuerl", "(Nuvie)");
+				add_person("Eric Fry", "yuv422", "(Nuvie)");
+				add_person("Jeremy Newman", "laxdragon", "(Nuvie)");
+				add_person("Jonathan E. Wright", "nelno", "(Nuvie)");
+				add_person("Joseph Applegate", "sb-x", "(Nuvie)");
+				add_person("Malignant Manor", "malignantmanor", "(Nuvie)");
+				add_person("Markus Niemist&ouml;", "niemisto", "(Nuvie)");
+				add_person("Michael Fink", "vividos", "(Nuvie)");
+				add_person("Pieter Luteijn", "luteijn", "(Nuvie)");
+				add_person("Sam Matthews", "samuelmatthews", "(Nuvie)");
+				add_person("Travis Howell", "kirben", "(Nuvie)");
+				add_person("Willem Jan Palenstijn", "wjp", "(Nuvie)");
+
+				add_person("Brian Tietz", "btietz", "(Pentagram)");
+				add_person("Dominik Reichardt", "Dominus Dragon", "(Pentagram)");
+				add_person("Max Horn", "Fingolfin", "(Pentagram)");
+				add_person("Patrick Burke", "takhisis", "(Pentagram)");
+				add_person("Ryan Nunn", "Colourless Dragon", "(Pentagram)");
+				add_person("Willem Jan Palenstijn", "wjp", "(Pentagram)");
 			end_section();
 
 			begin_section("Voyeur");
@@ -1547,8 +1585,8 @@ begin_credits("Credits");
 			"of the Hugo trilogy.");
 
 		add_paragraph(
-			"Broken Sword 2.5 team for providing sources of their engine and their great ".
-			"support.");
+			"The mindFactory team for writing Broken Sword 2.5, a splendid fan-made sequel, and for sharing ".
+			"the source code with us.");
 
 		add_paragraph(
 			"Neil Dodwell and David Dew from Creative Reality for providing the source ".
@@ -1572,14 +1610,10 @@ begin_credits("Credits");
 			"James M. Ferguson and Barry Duncan for their tenacious efforts to recover the sources.");
 
 		add_paragraph(
-			"The mindFactory team for writing Broken Sword 2.5, a splendid fan-made sequel, and for sharing ".
-			"the source code with us.");
+			"John Romero for sharing the source code of Hyperspace Delivery Boy! with us.");
 
 		add_paragraph(
-		"John Romero for sharing the source code of Hyperspace Delivery Boy! with us.");
-
-		add_paragraph(
-		"Steffen Dingel for sharing the source code of the Mission Supernova game with us.");
+			"Steffen Dingel for sharing the source code of the Mission Supernova game with us.");
 
 	end_section();
 

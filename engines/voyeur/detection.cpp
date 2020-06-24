@@ -28,7 +28,6 @@
 #include "common/memstream.h"
 #include "engines/advancedDetector.h"
 #include "common/system.h"
-#include "graphics/colormasks.h"
 #include "graphics/surface.h"
 
 #define MAX_SAVES 99
@@ -70,24 +69,24 @@ public:
 		_maxScanDepth = 3;
 	}
 
-	virtual const char *getEngineId() const {
+	const char *getEngineId() const override {
 		return "voyeur";
 	}
 
-	virtual const char *getName() const {
+	const char *getName() const override {
 		return "Voyeur";
 	}
 
-	virtual const char *getOriginalCopyright() const {
+	const char *getOriginalCopyright() const override {
 		return "Voyeur (C) Philips P.O.V. Entertainment Group";
 	}
 
-	virtual bool hasFeature(MetaEngineFeature f) const;
-	virtual bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const;
-	virtual SaveStateList listSaves(const char *target) const;
-	virtual int getMaximumSaveSlot() const;
-	virtual void removeSaveState(const char *target, int slot) const;
-	SaveStateDescriptor querySaveMetaInfos(const char *target, int slot) const;
+	bool hasFeature(MetaEngineFeature f) const override;
+	bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+	SaveStateList listSaves(const char *target) const override;
+	int getMaximumSaveSlot() const override;
+	void removeSaveState(const char *target, int slot) const override;
+	SaveStateDescriptor querySaveMetaInfos(const char *target, int slot) const override;
 };
 
 bool VoyeurMetaEngine::hasFeature(MetaEngineFeature f) const {
@@ -102,7 +101,7 @@ bool VoyeurMetaEngine::hasFeature(MetaEngineFeature f) const {
 
 bool Voyeur::VoyeurEngine::hasFeature(EngineFeature f) const {
 	return
-		(f == kSupportsRTL) ||
+		(f == kSupportsReturnToLauncher) ||
 		(f == kSupportsLoadingDuringRuntime) ||
 		(f == kSupportsSavingDuringRuntime);
 }

@@ -209,7 +209,7 @@ void GUI_LoK::createScreenThumbnail(Graphics::Surface &dst) {
 			if (_screen->isInterfacePaletteEnabled()) {
 				for (int y = 0; y < 64; ++y) {
 					for (int x = 0; x < 320; ++x) {
-						screen[(y + 136) * Screen::SCREEN_W + x] += 32;
+						screen[(y + 136) * Screen::SCREEN_W + x] |= 0x20;
 					}
 				}
 			}
@@ -361,7 +361,7 @@ void GUI_LoK::setGUILabels() {
 			offset = 52;
 		else if (_vm->gameFlags().lang == Common::DE_DEU)
 			offset = 30;
-		else if (_vm->gameFlags().lang == Common::FR_FRA || _vm->gameFlags().lang == Common::IT_ITA)
+		else if (_vm->gameFlags().lang == Common::FR_FRA || _vm->gameFlags().lang == Common::IT_ITA || _vm->gameFlags().lang == Common::ES_ESP)
 			offset = 6;
 		offsetOn = offsetMainMenu = offsetOptions = offset;
 		walkspeedGarbageOffset = 48;

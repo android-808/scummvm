@@ -110,6 +110,7 @@ public:
 	static const int kArchiveCount = 12; // +2 to original value (10) to accommodate for SUBTITLES.MIX and one extra resource file, to allow for capability of loading all VQAx.MIX and the MODE.MIX file (debug purposes)
 	static const int kActorCount =  100;
 	static const int kActorVoiceOver = kActorCount - 1;
+
 	// Incremental number to keep track of significant revisions of the ScummVM bladerunner engine
 	// that could potentially introduce incompatibilities with old save files or require special actions to restore compatibility
 	// This is stored in game global variable "kVariableGameVersion"
@@ -126,6 +127,7 @@ public:
 	Common::String   _languageCode;
 	Common::Language _language;
 	bool             _russianCP1251;
+	bool             _noMusicDriver; // If "Music Device" is set to "No Music" from Audio tab
 
 	ActorDialogueQueue *_actorDialogueQueue;
 	ScreenEffects      *_screenEffects;
@@ -188,6 +190,8 @@ public:
 
 	Graphics::Surface  _surfaceFront;
 	Graphics::Surface  _surfaceBack;
+	bool               _surfaceFrontCreated;
+	bool               _surfaceBackCreated;
 
 	ZBuffer           *_zbuffer;
 
@@ -205,6 +209,7 @@ public:
 	bool _actorIsSpeaking;
 	bool _actorSpeakStopIsRequested;
 	bool _gameOver;
+	bool _gameJustLaunched;
 	int  _gameAutoSaveTextId;
 	bool _gameIsAutoSaving;
 	bool _gameIsLoading;
@@ -216,7 +221,9 @@ public:
 	bool _shortyMode;
 	bool _noDelayMillisFramelimiter;
 	bool _framesPerSecondMax;
+	bool _disableStaminaDrain;
 	bool _cutContent;
+	bool _validBootParam;
 
 	int _walkSoundId;
 	int _walkSoundVolume;
@@ -251,13 +258,13 @@ private:
 
 public:
 	BladeRunnerEngine(OSystem *syst, const ADGameDescription *desc);
-	~BladeRunnerEngine();
+	~BladeRunnerEngine() override;
 
 	bool hasFeature(EngineFeature f) const override;
 	bool canLoadGameStateCurrently() override;
 	Common::Error loadGameState(int slot) override;
 	bool canSaveGameStateCurrently() override;
-	Common::Error saveGameState(int slot, const Common::String &desc) override;
+	Common::Error saveGameState(int slot, const Common::String &desc, bool isAutosave = false) override;
 	void pauseEngineIntern(bool pause) override;
 
 	Common::Error run() override;
@@ -301,7 +308,7 @@ public:
 	bool closeArchive(const Common::String &name);
 	bool isArchiveOpen(const Common::String &name) const;
 
-	void syncSoundSettings();
+	void syncSoundSettings() override;
 	bool isSubtitlesEnabled();
 	void setSubtitlesEnabled(bool newVal);
 
@@ -322,7 +329,6 @@ public:
 	void blitToScreen(const Graphics::Surface &src) const;
 	Graphics::Surface generateThumbnail() const;
 
-	GUI::Debugger *getDebugger();
 	Common::String getTargetName() const;
 };
 

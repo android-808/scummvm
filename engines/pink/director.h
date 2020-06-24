@@ -30,10 +30,6 @@
 #include "graphics/macgui/macwindowmanager.h"
 #include "graphics/screen.h"
 
-namespace Common {
-	class PEResources;
-}
-
 namespace Graphics {
 	class MacMenu;
 }
@@ -74,7 +70,7 @@ public:
 	void saveStage();
 	void loadStage();
 
-	Actor *getActorByPoint(const Common::Point point);
+	Actor *getActorByPoint(Common::Point point);
 
 	Graphics::MacWindowManager &getWndManager() { return *_wm; };
 

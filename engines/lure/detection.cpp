@@ -93,11 +93,11 @@ static const LureGameDescription gameDescriptions[] = {
 			Common::EN_ANY,
 			Common::kPlatformDOS,
 			ADGF_NO_FLAGS,
-			#ifdef USE_TTS
-				GUIO1(GAMEOPTION_TTS_NARRATOR)
-			#else
-				GUIO0()
-			#endif
+#ifdef USE_TTS
+			GUIO1(GAMEOPTION_TTS_NARRATOR)
+#else
+			GUIO0()
+#endif
 		},
 		GF_FLOPPY,
 	},
@@ -110,12 +110,11 @@ static const LureGameDescription gameDescriptions[] = {
 			Common::EN_ANY,
 			Common::kPlatformDOS,
 			ADGF_NO_FLAGS,
-			#ifdef USE_TTS
-				GUIO1(GAMEOPTION_TTS_NARRATOR)
-			#else
-				GUIO0()
-			#endif
-
+#ifdef USE_TTS
+			GUIO1(GAMEOPTION_TTS_NARRATOR)
+#else
+			GUIO0()
+#endif
 		},
 		GF_FLOPPY | GF_EGA,
 	},
@@ -235,9 +234,9 @@ static const LureGameDescription gameDescriptions[] = {
 class LureMetaEngine : public AdvancedMetaEngine {
 public:
 	LureMetaEngine() : AdvancedMetaEngine(Lure::gameDescriptions, sizeof(Lure::LureGameDescription), lureGames
-			#ifdef USE_TTS
+#ifdef USE_TTS
 			, optionsList
-			#endif
+#endif
 			) {
 		_md5Bytes = 1024;
 
@@ -247,23 +246,23 @@ public:
 		_guiOptions = GUIO1(GUIO_NOSPEECH);
 	}
 
-	const char *getEngineId() const {
+	const char *getEngineId() const override {
 		return "lure";
 	}
 
-	virtual const char *getName() const {
+	const char *getName() const override {
 		return "Lure of the Temptress";
 	}
 
-	virtual const char *getOriginalCopyright() const {
+	const char *getOriginalCopyright() const override {
 		return "Lure of the Temptress (C) Revolution";
 	}
 
-	virtual bool hasFeature(MetaEngineFeature f) const;
-	virtual bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const;
-	virtual SaveStateList listSaves(const char *target) const;
-	virtual int getMaximumSaveSlot() const;
-	virtual void removeSaveState(const char *target, int slot) const;
+	bool hasFeature(MetaEngineFeature f) const override;
+	bool createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+	SaveStateList listSaves(const char *target) const override;
+	int getMaximumSaveSlot() const override;
+	void removeSaveState(const char *target, int slot) const override;
 };
 
 bool LureMetaEngine::hasFeature(MetaEngineFeature f) const {
@@ -275,7 +274,7 @@ bool LureMetaEngine::hasFeature(MetaEngineFeature f) const {
 
 bool Lure::LureEngine::hasFeature(EngineFeature f) const {
 	return
-		(f == kSupportsRTL) ||
+		(f == kSupportsReturnToLauncher) ||
 		(f == kSupportsLoadingDuringRuntime) ||
 		(f == kSupportsSavingDuringRuntime);
 }

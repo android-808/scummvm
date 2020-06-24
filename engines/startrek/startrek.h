@@ -227,11 +227,11 @@ protected:
 	// startrek.cpp
 public:
 	StarTrekEngine(OSystem *syst, const StarTrekGameDescription *gamedesc);
-	virtual ~StarTrekEngine();
+	~StarTrekEngine() override;
 
 	friend class Console;
 
-	Common::Error run();
+	Common::Error run() override;
 	Common::Error runGameMode(int mode, bool resume);
 
 	// Transporter room
@@ -242,6 +242,8 @@ public:
 	void cleanupBridge() {}; // TODO
 
 	Common::MemoryReadStreamEndian *loadFile(Common::String filename, int fileIndex = 0);
+	Common::MemoryReadStreamEndian *loadBitmapFile(Common::String baseName);
+
 	/**
 	 * TODO: Figure out what the extra parameters are, and if they're important.
 	 */
@@ -547,8 +549,6 @@ private:
 	char _textInputBuffer[TEXT_INPUT_BUFFER_SIZE];
 	int16 _textInputCursorPos;
 	char _textInputCursorChar;
-	Bitmap *_textInputBitmapSkeleton;
-	Bitmap *_textInputBitmap;
 	Sprite _textInputSprite;
 
 	// menu.cpp
@@ -570,7 +570,7 @@ public:
 	 * Draws or removes the outline on menu buttons when the cursor hovers on them, or leaves
 	 * them.
 	 */
-	void drawMenuButtonOutline(SharedPtr<Bitmap> bitmap, byte color);
+	void drawMenuButtonOutline(Bitmap *bitmap, byte color);
 	void showOptionsMenu(int x, int y);
 	/**
 	 * Show the "action selection" menu, ie. look, talk, etc.
@@ -763,7 +763,6 @@ public:
 
 	Graphics *_gfx;
 	Sound *_sound;
-	Console *_console;
 	IWFile *_iwFile;
 
 private:

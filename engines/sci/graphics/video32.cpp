@@ -28,8 +28,7 @@
 #endif
 #include "common/util.h"                 // for ARRAYSIZE
 #include "common/system.h"               // for g_system
-#include "engine.h"                      // for Engine, g_engine
-#include "graphics/colormasks.h"         // for createPixelFormat
+#include "engines/engine.h"              // for Engine, g_engine
 #include "graphics/palette.h"            // for PaletteManager
 #include "graphics/transparent_surface.h" // for TransparentSurface
 #include "sci/console.h"                 // for Console
@@ -50,6 +49,7 @@
 #include "sci/video/seq_decoder.h"       // for SEQDecoder
 #include "video/avi_decoder.h"           // for AVIDecoder
 #include "video/coktel_decoder.h"        // for AdvancedVMDDecoder
+#include "video/qt_decoder.h"            // for QuickTimeDecoder
 #include "sci/graphics/video32.h"
 
 namespace Graphics { struct Surface; }
@@ -66,7 +66,7 @@ bool VideoPlayer::open(const Common::String &fileName) {
 	// KQ7 2.00b videos are compressed in 24bpp Cinepak, so cannot play on a
 	// system with no RGB support
 	if (_decoder->getPixelFormat().bytesPerPixel != 1) {
-		void showScummVMDialog(const Common::String &message);
+		void showScummVMDialog(const Common::String &message, const char* altButton = nullptr, bool alignCenter = true);
 		showScummVMDialog(Common::String::format(_("Cannot play back %dbpp video on a system with maximum color depth of 8bpp"), _decoder->getPixelFormat().bpp()));
 		_decoder->close();
 		return false;
@@ -505,6 +505,41 @@ uint16 AVIPlayer::getDuration() const {
 }
 
 #pragma mark -
+#pragma mark QuickTimePlayer
+
+QuickTimePlayer::QuickTimePlayer(EventManager *eventMan) :
+	VideoPlayer(eventMan) {}
+
+void QuickTimePlayer::play(const Common::String& fileName) {
+	_decoder.reset(new Video::QuickTimeDecoder());
+
+	if (!VideoPlayer::open(fileName)) {
+		_decoder.reset();
+		return;
+	}
+
+	const int16 scriptWidth = g_sci->_gfxFrameout->getScriptWidth();
+	const int16 scriptHeight = g_sci->_gfxFrameout->getScriptHeight();
+	const int16 screenWidth = g_sci->_gfxFrameout->getScreenWidth();
+	const int16 screenHeight = g_sci->_gfxFrameout->getScreenHeight();
+
+	const int16 scaledWidth = (_decoder->getWidth() * Ratio(screenWidth, scriptWidth)).toInt();
+	const int16 scaledHeight = (_decoder->getHeight() * Ratio(screenHeight, scriptHeight)).toInt();
+
+	_drawRect.left = (screenWidth - scaledWidth) / 2;
+	_drawRect.top = (screenHeight - scaledHeight) / 2;
+	_drawRect.setWidth(scaledWidth);
+	_drawRect.setHeight(scaledHeight);
+
+	startHQVideo();
+	playUntilEvent(kEventFlagMouseDown | kEventFlagEscapeKey);
+	endHQVideo();
+
+	g_system->fillScreen(0);
+	_decoder.reset();
+}
+
+#pragma mark -
 #pragma mark VMDPlayer
 
 VMDPlayer::VMDPlayer(EventManager *eventMan, SegManager *segMan) :
@@ -597,7 +632,7 @@ void VMDPlayer::init(int16 x, int16 y, const PlayFlags flags, const int16 boostP
 	if (getSciVersion() < SCI_VERSION_3) {
 		x &= ~1;
 	}
-	
+
 	if (upscaleVideos) {
 		x = (screenWidth - width) / 2;
 		y = (screenHeight - height) / 2;
@@ -776,7 +811,7 @@ int16 VMDPlayer::addBlob(int16 blockSize, int16 top, int16 left, int16 bottom, i
 	if (_blobs.size() >= kMaxBlobs) {
 		return -1;
 	}
-	
+
 	int16 blobNumber = 0;
 	Common::List<Blob>::iterator prevBlobIterator = _blobs.begin();
 	for (; prevBlobIterator != _blobs.end(); ++prevBlobIterator, ++blobNumber) {
@@ -936,7 +971,9 @@ void VMDPlayer::closeOverlay() {
 	}
 #endif
 
-	g_sci->_gfxFrameout->frameOut(true, _drawRect);
+	if (!_leaveLastFrame && _leaveScreenBlack) {
+		g_sci->_gfxFrameout->frameOut(true, _drawRect);
+	}
 }
 
 void VMDPlayer::initComposited() {

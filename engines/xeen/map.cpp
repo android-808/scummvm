@@ -303,7 +303,12 @@ MobStruct::MobStruct() {
 bool MobStruct::synchronize(XeenSerializer &s) {
 	s.syncAsSint8(_pos.x);
 	s.syncAsSint8(_pos.y);
-	s.syncAsByte(_id);
+
+	byte v = (_id == -1) ? 0xff : _id;
+	s.syncAsByte(v);
+	if (s.isLoading())
+		_id = (v == 0xff) ? -1 : v;
+
 	s.syncAsByte(_direction);
 
 	return _id != 0xff || _pos.x != -1 || _pos.y != -1;
@@ -477,7 +482,10 @@ void MonsterObjectData::synchronize(XeenSerializer &s, MonsterData &monsterData)
 
 			_objects.push_back(obj);
 			mobStruct.synchronize(s);
-		} while (mobStruct._id != 255 || mobStruct._pos.x != -1);
+			if (s.finished())
+				// WORKAROUND: If end of data abnormally reached
+				return;
+		} while (mobStruct._id != -1 || mobStruct._pos.x != -1);
 
 		// Load monsters
 		mobStruct.synchronize(s);
@@ -485,7 +493,11 @@ void MonsterObjectData::synchronize(XeenSerializer &s, MonsterData &monsterData)
 			// Empty array has a blank entry
 			mobStruct.synchronize(s);
 
-		while (mobStruct._id != 255 || mobStruct._pos.x != -1) {
+		while (mobStruct._id != -1 || mobStruct._pos.x != -1) {
+			if (s.finished())
+				// WORKAROUND: If end of data abnormally reached
+				return;
+
 			MazeMonster mon;
 			mon._position = mobStruct._pos;
 			mon._id = mobStruct._id;
@@ -513,7 +525,11 @@ void MonsterObjectData::synchronize(XeenSerializer &s, MonsterData &monsterData)
 
 		// Load wall items. Unlike the previous two arrays, this has no dummy entry for an empty array
 		mobStruct.synchronize(s);
-		while (mobStruct._id != 255 || mobStruct._pos.x != -1) {
+		while (mobStruct._id != -1 || mobStruct._pos.x != -1) {
+			if (s.finished())
+				// WORKAROUND: If end of data abnormally reached
+				return;
+
 			if (mobStruct._id < (int)_wallItemSprites.size()) {
 				MazeWallItem wi;
 				wi._position = mobStruct._pos;
@@ -785,17 +801,22 @@ void Map::load(int mapId) {
 				}
 			} else if (File::exists(mobName)) {
 				// For surrounding maps, set up flags for whether objects are present
-				// Load the monster/object data
-				File mobFile(mobName);
-				XeenSerializer sMob(&mobFile, nullptr);
-				MonsterObjectData mobData(_vm);
-				mobData.synchronize(sMob, _monsterData);
-				mobFile.close();
 
-				mazeDataP->_objectsPresent.resize(mobData._objects.size());
-				for (uint objIndex = 0; objIndex < mobData._objects.size(); ++objIndex) {
-					const Common::Point &pt = mobData._objects[objIndex]._position;
-					mazeDataP->_objectsPresent[objIndex] = ABS(pt.x) != 128 && ABS(pt.y) != 128;
+				// WORKAROUND: In WOX Map 120, one of the maps for Deep Mine Alpha,
+				// has invalid monster data. So to work around it, we just ignore it
+				if (!(mapId == 120 && g_vm->getGameID() == GType_WorldOfXeen)) {
+					// Load the monster/object data
+					File mobFile(mobName);
+					XeenSerializer sMob(&mobFile, nullptr);
+					MonsterObjectData mobData(_vm);
+					mobData.synchronize(sMob, _monsterData);
+					mobFile.close();
+
+					mazeDataP->_objectsPresent.resize(mobData._objects.size());
+					for (uint objIndex = 0; objIndex < mobData._objects.size(); ++objIndex) {
+						const Common::Point &pt = mobData._objects[objIndex]._position;
+						mazeDataP->_objectsPresent[objIndex] = ABS(pt.x) != 128 && ABS(pt.y) != 128;
+					}
 				}
 			}
 		}

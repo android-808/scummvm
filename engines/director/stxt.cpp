@@ -34,6 +34,16 @@ Stxt::Stxt(Common::SeekableSubReadStreamEndian &textStream) {
 	uint32 dataLen = textStream.readUint32();
 	Common::String text;
 
+	_fontId = 0;
+	_fontSize = 12;
+	_textType = kTextTypeFixed;
+	_textAlign = kTextAlignLeft;
+	_textShadow = kSizeNone;
+	_textSlant = 0;
+	_palinfo1 = _palinfo2 = _palinfo3 = 0;
+	_unk1f = _unk2f = 0;
+	_unk3f = 0;
+
 	for (uint32 i = 0; i < strLen; i++) {
 		byte ch = textStream.readByte();
 		if (ch == 0x0d) {
@@ -65,7 +75,7 @@ Stxt::Stxt(Common::SeekableSubReadStreamEndian &textStream) {
 		_palinfo3 = textStream.readUint16();
 
 		debugC(3, kDebugText, "Stxt init: formattingCount: %u, formatStartOffset: %d, height: %d ascent: %d, fontId: %d, textSlant: %d padding: 0x%02x",
-			   formattingCount, formatStartOffset, height, ascent, _fontId, _textSlant, padding);
+				formattingCount, formatStartOffset, height, ascent, _fontId, _textSlant, padding);
 
 		debugC(3, kDebugText, "        fontSize: %d, p0: %x p1: %x p2: %x", _fontSize, _palinfo1, _palinfo2, _palinfo3);
 
@@ -76,7 +86,7 @@ Stxt::Stxt(Common::SeekableSubReadStreamEndian &textStream) {
 			_ftext += text.firstChar();
 			text.deleteChar(0);
 
-			if (f == '\001')    // Insert two \001s as a replacement
+			if (f == '\001')	// Insert two \001s as a replacement
 				_ftext += '\001';
 
 			prevPos++;

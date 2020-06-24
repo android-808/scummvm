@@ -65,7 +65,7 @@ enum {
 
 static const char *copyright_text[] = {
 "",
-"C0""Copyright (C) 2001-2019 The ScummVM Team",
+"C0""Copyright (C) 2001-2020 The ScummVM Team",
 "C0""https://www.scummvm.org",
 "",
 "C0""ScummVM is the legal property of its developers, whose names are too numerous to list here. Please refer to the COPYRIGHT file distributed with this binary.",
@@ -156,7 +156,7 @@ void AboutDialog::addLine(const char *str) {
 			// We could use TransMan.getCurrentCharset() but rather than compare strings
 			// it is easier to use TransMan.getCharsetMapping() (non null in case of non
 			// ISO-8859-1 mapping)
-			useAscii = (TransMan.getCharsetMapping() != NULL);
+			useAscii = (TransMan.getCharsetMapping() != nullptr);
 #endif
 			if (useAscii)
 				asciiStr = str;
@@ -473,7 +473,7 @@ void EE::run() {
 		while (g_system->getEventManager()->pollEvent(event)) {
 			switch (event.type) {
 			case Common::EVENT_QUIT:
-			case Common::EVENT_RTL:
+			case Common::EVENT_RETURN_TO_LAUNCHER:
 				_shouldQuit = true;
 				break;
 
@@ -779,9 +779,9 @@ bool EE::moveball() {
 		hitfloor = true;
 	}
 
-	if (rbvely > 0)
-		rbvely += 1;
-	else
+	//if (rbvely > 0) // Checked with original, this is how it is
+	//	rbvely += 1;
+	//else
 		rbvely += 1;
 
 	_tbx = _bx >> 6;
@@ -1085,6 +1085,8 @@ void EE::init() {
 	_serve = _servevel = 1;
 
 	_rmode = false;
+
+	_shouldQuit = false;
 }
 
 void EE::drawStatus(Common::String str, int x, uint32 color, int y, int color2, int w) {

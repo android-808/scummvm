@@ -25,7 +25,9 @@
 
 #include "common/scummsys.h"
 #include "common/str.h"
+#include "common/stream.h"
 #include "common/timer.h"
+#include "common/array.h"
 
 class MidiChannel;
 
@@ -78,7 +80,8 @@ enum MidiDriverFlags {
 	MDT_PC98        = 1 << 8,		// FM-TOWNS: Maps to MT_PC98
 	MDT_MIDI        = 1 << 9,		// Real MIDI
 	MDT_PREFER_MT32 = 1 << 10,		// MT-32 output is preferred
-	MDT_PREFER_GM   = 1 << 11		// GM output is preferred
+	MDT_PREFER_GM   = 1 << 11,		// GM output is preferred
+	MDT_PREFER_FLUID= 1 << 12		// FluidSynth driver is preferred
 };
 
 /**
@@ -86,7 +89,9 @@ enum MidiDriverFlags {
  */
 class MidiDriver_BASE {
 public:
-	virtual ~MidiDriver_BASE() { }
+	MidiDriver_BASE();
+
+	virtual ~MidiDriver_BASE();
 
 	/**
 	 * Output a packed midi command to the midi stream.
@@ -97,18 +102,30 @@ public:
 	virtual void send(uint32 b) = 0;
 
 	/**
+	 * Send a MIDI command from a specific source. If the MIDI driver
+	 * does not support multiple sources, the source parameter is
+	 * ignored.
+	 */
+	virtual void send(int8 source, uint32 b) { send(b); }
+
+	/**
 	 * Output a midi command to the midi stream. Convenience wrapper
 	 * around the usual 'packed' send method.
 	 *
 	 * Do NOT use this for sysEx transmission; instead, use the sysEx()
 	 * method below.
 	 */
-	void send(byte status, byte firstOp, byte secondOp) {
-		send(status | ((uint32)firstOp << 8) | ((uint32)secondOp << 16));
-	}
+	void send(byte status, byte firstOp, byte secondOp);
+	
+	/**
+	 * Send a MIDI command from a specific source. If the MIDI driver
+	 * does not support multiple sources, the source parameter is
+	 * ignored.
+	 */
+	void send(int8 source, byte status, byte firstOp, byte secondOp);
 
 	/**
-	 * Transmit a sysEx to the midi device.
+	 * Transmit a SysEx to the MIDI device.
 	 *
 	 * The given msg MUST NOT contain the usual SysEx frame, i.e.
 	 * do NOT include the leading 0xF0 and the trailing 0xF7.
@@ -119,8 +136,61 @@ public:
 	 */
 	virtual void sysEx(const byte *msg, uint16 length) { }
 
+	/**
+	 * Transmit a SysEx to the MIDI device and return the necessary
+	 * delay until the next SysEx event in milliseconds.
+	 *
+	 * This can be used to implement an alternate delay method than the
+	 * OSystem::delayMillis function used by most sysEx implementations.
+	 * Note that not every driver needs a delay, or supports this method.
+	 * In this case, 0 is returned and the driver itself will do a delay 
+	 * if necessary.
+	 *
+	 * For information on the SysEx data requirements, see the sysEx method.
+	 */
+	virtual uint16 sysExNoDelay(const byte *msg, uint16 length) { sysEx(msg, length); return 0; }
+
 	// TODO: Document this.
 	virtual void metaEvent(byte type, byte *data, uint16 length) { }
+
+	/**
+	 * Send a meta event from a specific source. If the MIDI driver
+	 * does not support multiple sources, the source parameter is
+	 * ignored.
+	 */
+	virtual void metaEvent(int8 source, byte type, byte *data, uint16 length) { metaEvent(type, data, length); }
+protected:
+
+	/**
+	 * Enables midi dumping to a 'dump.mid' file and to debug messages on screen
+	 * It's set by '--dump-midi' command line parameter
+	 */
+	bool _midiDumpEnable;
+
+	/** Used for MIDI dumping delta calculation */
+	uint32 _prevMillis;
+
+	/** Stores all MIDI events, will be written to disk after an engine quits */
+	Common::Array<byte> _midiDumpCache;
+
+	/** Initialize midi dumping mechanism, called only if enabled */
+	void midiDumpInit();
+
+	/** Handles MIDI file variable length dumping */
+	int midiDumpVarLength(const uint32 &delta);
+
+	/** Handles MIDI file time delta dumping */
+	void midiDumpDelta();
+
+	/** Performs dumping of MIDI commands, called only if enabled */
+	void midiDumpDo(uint32 b);
+
+	/** Performs dumping of MIDI SysEx commands, called only if enabled */
+	void midiDumpSysEx(const byte *msg, uint16 length);
+
+	/** Writes the captured MIDI events to disk, called only if enabled */
+	void midiDumpFinish();
+
 };
 
 /**
@@ -166,6 +236,20 @@ public:
 	/** Get the device description string matching the given device handle and the given type. */
 	static Common::String getDeviceString(DeviceHandle handle, DeviceStringType type);
 
+	/** Common operations to be done by all drivers on start of send */
+	void midiDriverCommonSend(uint32 b);
+
+	/** Common operations to be done by all drivers on start of sysEx */
+	void midiDriverCommonSysEx(const byte *msg, uint16 length);
+
+protected:
+	// True if stereo panning should be reversed.
+	bool _reversePanning;
+	// True if GS percussion channel volume should be scaled to match MT-32 volume.
+	bool _scaleGSPercussionVolumeToMT32;
+	// The currently selected GS instrument bank / variation for each channel.
+	byte _gsBank[16];
+
 private:
 	// If detectDevice() detects MT32 and we have a preferred MT32 device
 	// we use this to force getMusicType() to return MT_MT32 so that we don't
@@ -175,10 +259,18 @@ private:
 	static bool _forceTypeMT32;
 
 public:
+	MidiDriver() : _reversePanning(false),
+					_scaleGSPercussionVolumeToMT32(false) {
+		memset(_gsBank, 0, sizeof(_gsBank));
+	}
 	virtual ~MidiDriver() { }
 
 	static const byte _mt32ToGm[128];
 	static const byte _gmToMt32[128];
+	static const byte _mt32DefaultInstruments[8];
+	static const byte _mt32DefaultPanning[8];
+	// Map for correcting Roland GS drumkit numbers.
+	static const uint8 _gsDrumkitFallbackMap[128];
 
 	/**
 	 * Error codes returned by open.
@@ -230,9 +322,26 @@ public:
 	}
 
 	/**
+	 * Initializes the MT-32 MIDI device. The device will be reset and, 
+	 * if the parameter is specified, set up for General MIDI data.
+	 * @param initForGM True if the MT-32 should be initialized for GM mapping
+	 */
+	void initMT32(bool initForGM);
+
+	/**
 	 * Send a Roland MT-32 reset sysEx to the midi device.
 	 */
 	void sendMT32Reset();
+
+	/**
+	 * Initializes the General MIDI device. The device will be reset.
+	 * If the initForMT32 parameter is specified, the device will be set up for
+	 * MT-32 MIDI data. If the device supports Roland GS, the enableGS
+	 * parameter can be specified for enhanced GS MT-32 compatiblity.
+	 * @param initForMT32 True if the device should be initialized for MT-32 mapping
+	 * @param enableGS True if the device should be initialized for GS MT-32 mapping
+	 */
+	void initGM(bool initForMT32, bool enableGS);
 
 	/**
 	 * Send a General MIDI reset sysEx to the midi device.
@@ -250,6 +359,24 @@ public:
 	// Channel allocation functions
 	virtual MidiChannel *allocateChannel() = 0;
 	virtual MidiChannel *getPercussionChannel() = 0;
+
+	// Allow an engine to supply its own soundFont data. This stream will be destroyed after use.
+	virtual void setEngineSoundFont(Common::SeekableReadStream *soundFontData) { }
+
+	// Does this driver accept soundFont data?
+	virtual bool acceptsSoundFontData() { return false; }
+
+protected:
+	/**
+	 * Checks if the currently selected GS bank / instrument variation
+	 * on the specified channel is valid for the specified patch.
+	 * If this is not the case, the correct bank will be returned which
+	 * can be set by sending a bank select message. If no correction is
+	 * needed, 0xFF will be returned.
+	 * This emulates the fallback functionality of the Roland SC-55 v1.2x,
+	 * on which some games rely to correct wrong bank selects.
+	 */
+	byte correctInstrumentBank(byte outputChannel, byte patchId);
 };
 
 class MidiChannel {

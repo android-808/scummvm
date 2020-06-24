@@ -42,20 +42,19 @@ enum CastType {
 };
 
 enum ScriptType {
-	kMovieScript = 0,
-	kSpriteScript = 1,
-	kFrameScript = 2,
-	kCastScript = 3,
-	kGlobalScript = 4,
 	kNoneScript = -1,
-	kMaxScriptType = 4	// Sync with score.cpp:45, array scriptTypes[]
+	kMovieScript = 0,
+	kCastScript = 1,
+	kGlobalScript = 2,
+	kScoreScript = 3,
+	kMaxScriptType = 3	// Sync with score.cpp:45, array scriptTypes[]
 };
 
 enum ShapeType {
-	kShapeRectangle,
-	kShapeRoundRect,
-	kShapeOval,
-	kShapeLine
+	kShapeRectangle = 1,
+	kShapeRoundRect = 2,
+	kShapeOval = 3,
+	kShapeLine = 4
 };
 
 enum TextType {
@@ -71,9 +70,9 @@ enum TextAlignType {
 };
 
 enum TextFlag {
-	kTextFlagEditable,
-	kTextFlagAutoTab,
-	kTextFlagDoNotWrap
+	kTextFlagEditable	= (1 << 0),
+	kTextFlagAutoTab	= (1 << 1),
+	kTextFlagDoNotWrap	= (1 << 2)
 };
 
 enum SizeType {
@@ -89,6 +88,13 @@ enum ButtonType {
 	kTypeButton,
 	kTypeCheckBox,
 	kTypeRadio
+};
+
+enum FrameRateType {
+	kFrameRateDefault = -1,
+	kFrameRateNormal = 0,
+	kFrameRateFastest = 1,
+	kFrameRateFixed = 2
 };
 
 enum SpriteType {
@@ -134,6 +140,119 @@ enum InkType {
 	kInkTypeSub,
 	kInkTypeDark
 };
+
+enum LEvent {
+	kEventPrepareMovie,
+	kEventStartMovie,
+	kEventStepMovie,
+	kEventStopMovie,
+
+	kEventNew,
+	kEventBeginSprite,
+	kEventEndSprite,
+
+	kEventNone,
+	kEventEnterFrame,
+	kEventPrepareFrame,
+	kEventIdle,
+	kEventStepFrame,
+	kEventExitFrame,
+	kEventTimeout,
+
+	kEventActivateWindow,
+	kEventDeactivateWindow,
+	kEventMoveWindow,
+	kEventResizeWindow,
+	kEventOpenWindow,
+	kEventCloseWindow,
+
+	kEventKeyUp,
+	kEventKeyDown,
+	kEventMouseUp,
+	kEventMouseDown,
+	kEventRightMouseUp,
+	kEventRightMouseDown,
+	kEventMouseEnter,
+	kEventMouseLeave,
+	kEventMouseUpOutSide,
+	kEventMouseWithin,
+
+	kEventStart,
+	kEventStartUp
+};
+
+enum TransitionType {
+	kTransNone,
+	kTransWipeRight,
+	kTransWipeLeft,
+	kTransWipeDown,
+	kTransWipeUp,
+	kTransCenterOutHorizontal,	// 5
+	kTransEdgesInHorizontal,
+	kTransCenterOutVertical,
+	kTransEdgesInVertical,
+	kTransCenterOutSquare,
+	kTransEdgesInSquare,		// 10
+	kTransPushLeft,
+	kTransPushRight,
+	kTransPushDown,
+	kTransPushUp,
+	kTransRevealUp,				// 15
+	kTransRevealUpRight,
+	kTransRevealRight,
+	kTransRevealDownRight,
+	kTransRevealDown,
+	kTransRevealDownLeft,		// 20
+	kTransRevealLeft,
+	kTransRevealUpLeft,
+	kTransDissolvePixelsFast,
+	kTransDissolveBoxyRects,
+	kTransDissolveBoxySquares,	// 25
+	kTransDissolvePatterns,
+	kTransRandomRows,
+	kTransRandomColumns,
+	kTransCoverDown,
+	kTransCoverDownLeft,		// 30
+	kTransCoverDownRight,
+	kTransCoverLeft,
+	kTransCoverRight,
+	kTransCoverUp,
+	kTransCoverUpLeft,			// 35
+	kTransCoverUpRight,
+	kTransVenetianBlind,
+	kTransCheckerboard,
+	kTransStripsBottomBuildLeft,
+	kTransStripsBottomBuildRight,	// 40
+	kTransStripsLeftBuildDown,
+	kTransStripsLeftBuildUp,
+	kTransStripsRightBuildDown,
+	kTransStripsRightBuildUp,
+	kTransStripsTopBuildLeft,		// 45
+	kTransStripsTopBuildRight,
+	kTransZoomOpen,
+	kTransZoomClose,
+	kTransVerticalBinds,
+	kTransDissolveBitsFast,	// 50
+	kTransDissolvePixels,
+	kTransDissolveBits
+};
+
+enum {
+	kCursorDefault,
+	kCursorMouseDown,
+	kCursorMouseUp
+};
+
+enum ArchiveType {
+	kArchNone = -1,
+	kArchMain = 0,
+	kArchShared = 1
+};
+
+struct Datum;
+struct PCell;
+typedef Common::Array<Datum> DatumArray;
+typedef Common::Array<PCell> PropertyArray;
 
 const char *scriptType2str(ScriptType scr);
 
