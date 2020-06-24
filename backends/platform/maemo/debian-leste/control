@@ -7,27 +7,28 @@ Uploaders: David Weinehall <tao@debian.org>
           ,Dmitry Smirnov <onlyjob@debian.org>
           ,Stephen Kitt <skitt@debian.org>
 Build-Depends: debhelper-compat (= 12)
-              ,fonts-freefont-ttf
-              ,fonts-mplus
-              ,liba52-dev
+#              ,fonts-freefont-ttf
+#              ,fonts-mplus
+#              ,liba52-dev
               ,libasound2-dev [linux-any]
-              ,libfaad-dev
+#              ,libfaad-dev
               ,libflac-dev
-              ,libfluidsynth-dev
+#              ,libfluidsynth-dev
               ,libfreetype6-dev
-              ,libjpeg-dev
+#              ,libjpeg-dev
               ,libmad0-dev
               ,libmpeg2-4-dev
-              ,libpng-dev
-              ,libsdl2-dev | libsdl1.2-dev
-              ,libspeechd-dev
-              ,libtheora-dev
+#              ,libpng-dev
+#              ,libsdl2-dev | libsdl1.2-dev
+              ,libsdl1.2-dev
+#              ,libspeechd-dev
+#              ,libtheora-dev
               ,libvorbis-dev
               ,libz-dev
-              ,nasm [i386]
-              ,pkg-config
-              ,python3
-              ,zip
+#              ,nasm [i386]
+#              ,pkg-config
+#              ,python3
+#              ,zip
 # Cloud integration:
 #    ,libsdl2-net-dev
 #    ,libcurl4-gnutls-dev

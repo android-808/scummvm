@@ -31,28 +31,31 @@ override_dh_auto_clean:
 
 override_dh_auto_configure:
 	./configure \
-            --host=$(DEB_HOST_GNU_TYPE) \
-            --datadir=/usr/share/scummvm \
-            --disable-eventrecorder \
-            --enable-release \
+            --host=maemo-leste
+#            --host=$(DEB_HOST_GNU_TYPE) \
+#            --datadir=/usr/share/scummvm \
+#            --disable-eventrecorder \
+#            --enable-release \
             --enable-verbose-build \
-            --prefix=/usr $(OPTARGS) \
-	    --disable-engine=wintermute
+#            --prefix=/usr $(OPTARGS) \
+#            --disable-engine=wintermute
+            --disable-engine=gob
+ 
 
 override_dh_auto_build:
 ## replacing bundled fonts...
-	for F in gui/themes/*/Free*.ttf; do cp -v /usr/share/fonts/truetype/freefont/$${F##*/} $${F%/*}; done
-	for F in gui/themes/*/mplus*.ttf; do cp -v /usr/share/fonts/truetype/mplus/$${F##*/} $${F%/*}; done
+#	for F in gui/themes/*/Free*.ttf; do cp -v /usr/share/fonts/truetype/freefont/$${F##*/} $${F%/*}; done
+#	for F in gui/themes/*/mplus*.ttf; do cp -v /usr/share/fonts/truetype/mplus/$${F##*/} $${F%/*}; done
 ## re-build themes
-	cd gui/themes && python3 ./scummtheme.py makeall
+#	cd gui/themes && python3 ./scummtheme.py makeall
 ## build executable(s)...
 	dh_auto_build
 
 override_dh_installchangelogs:
 	dh_installchangelogs NEWS.md
 
-override_dh_gencontrol:
-	dh_gencontrol -- -Vmy:Built-Using="$(shell dpkg-query --show -f '$${source:Package} (=$${source:Version}),' fonts-freefont-ttf fonts-mplus)"
+#override_dh_gencontrol:
+#	dh_gencontrol -- -Vmy:Built-Using="$(shell dpkg-query --show -f '$${source:Package} (=$${source:Version}),' fonts-freefont-ttf fonts-mplus)"
 
 override_dh_dwz:
 	-dh_dwz -v
