@@ -40,7 +40,8 @@ Rules-Requires-Root: no
 
 Package: scummvm
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, scummvm-data (= ${source:Version})
+#Depends: ${misc:Depends}, ${shlibs:Depends}, scummvm-data (= ${source:Version})
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Suggests: fluidsynth | timidity
          ,beneath-a-steel-sky
          ,drascula
