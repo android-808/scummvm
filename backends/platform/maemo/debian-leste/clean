@@ -1,0 +1,6 @@
+## Debian CI:
+debian/.gitlab-ci.yml
+
+gui/themes/*.zip
+config.mk
+*.dwo

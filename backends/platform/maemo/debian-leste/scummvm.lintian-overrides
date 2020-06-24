@@ -1,0 +1,2 @@
+# The zlib files are just wrappers around the library
+scummvm: embedded-library usr/games/scummvm: zlib

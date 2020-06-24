@@ -1,0 +1,58 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+
+# #827145:
+# When building for i386 on an amd64 system/kernel, the host
+# architecture is misdetected as x86_64, which causes USE_NASM to be
+# unset and prevents the object files hq2x_i386.o and hq3x_i386.o from
+# being built.
+# This is fixed by passing the host architecture explicitely to
+# configure.
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+
+%:
+	dh $@ --max-parallel=4
+
+ifeq ($(DEB_BUILD_ARCH_OS),hurd)
+OPTARGS:= --disable-alsa
+endif
+ifeq ($(DEB_BUILD_ARCH_OS),kfreebsd)
+OPTARGS:= --disable-alsa
+endif
+
+override_dh_auto_clean:
+	##718164 "FTBFS: Makefile:87: *** You need to run ./configure before you can run make".
+	[ -f config.mk ] || touch config.mk
+	dh_auto_clean
+
+override_dh_auto_configure:
+	./configure \
+            --host=$(DEB_HOST_GNU_TYPE) \
+            --datadir=/usr/share/scummvm \
+            --disable-eventrecorder \
+            --enable-release \
+            --enable-verbose-build \
+            --prefix=/usr $(OPTARGS) \
+	    --disable-engine=wintermute
+
+override_dh_auto_build:
+## replacing bundled fonts...
+	for F in gui/themes/*/Free*.ttf; do cp -v /usr/share/fonts/truetype/freefont/$${F##*/} $${F%/*}; done
+	for F in gui/themes/*/mplus*.ttf; do cp -v /usr/share/fonts/truetype/mplus/$${F##*/} $${F%/*}; done
+## re-build themes
+	cd gui/themes && python3 ./scummtheme.py makeall
+## build executable(s)...
+	dh_auto_build
+
+override_dh_installchangelogs:
+	dh_installchangelogs NEWS.md
+
+override_dh_gencontrol:
+	dh_gencontrol -- -Vmy:Built-Using="$(shell dpkg-query --show -f '$${source:Package} (=$${source:Version}),' fonts-freefont-ttf fonts-mplus)"
+
+override_dh_dwz:
+	-dh_dwz -v

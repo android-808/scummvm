@@ -1,0 +1,671 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ScummVM
+Source: http://www.scummvm.org/
+Comment:
+ ScummVM was debianized by Bastien Nocera <hadess@hadess.net> the 5th Apr 2002.
+ It was adopted by Tore Anderson <tore@linpro.no> the 4th Oct 2002,
+ then adopted by David Weinehall <tao@debian.org> the 30th Jan 2006,
+ then adopted by the Debian Games Team by Moritz Muehlenhoff <jmm@debian.org>
+Files-Excluded:
+    engines/wintermute/utils/convert_utf.*
+    gui/themes/fonts/topaz
+    gui/themes/fonts/Arial*
+    */*/*/*/*.o*
+    */*/*/*.dll
+
+Files: *
+Copyright:
+    2001-2020 The ScummVM Project
+              The ScummVM Team
+    2002-2011 The DOSBox Team
+    1994-1998 Revolution Software Ltd.
+    2001-2004 Andrea Mazzoleni
+    2003-2005 Andreas 'Sprawl' Karlsso
+    2002-2008 Jurgen 'SumthinWicked' Braam
+    2003-2014 Lars 'AnotherGuest' Persso
+    2013-2014 Fedor Strizhniou
+    1990-2012 Neil Dodwell
+    1995-1997 Presto Studios, Inc.
+              and others listed in COPYRIGHT file
+License: GPL-2+
+Comment:
+ See list of copyright holders in "/usr/share/doc/scummvm/COPYRIGHT".
+ See list of upstream authors in "/usr/share/doc/scummvm/AUTHORS".
+
+Files:
+    gui/themes/fonts/mplus-2c-regular.ttf
+Copyright: 2017 M+ FONTS PROJECT
+License: unlimited
+ These fonts are free software.
+ Unlimited permission is granted to use, copy, and distribute them, with
+ or without modification, either commercially or noncommercially.
+ THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY.
+Comment: provided by "fonts-mplus".
+
+Files:
+    audio/mods/mod_xm_s3m.*
+    audio/mods/module_mod_xm_s3m.*
+Copyright: 2015 Martin Cameron
+License: GPL-2+
+Comment:
+ This code is based on IBXM mod player
+ .
+ Copyright (c) 2015, Martin Cameron
+ All rights reserved.
+ .
+ Redistribution and use in source and binary forms, with or
+ without modification, are permitted provided that the
+ following conditions are met:
+ .
+ * Redistributions of source code must retain the above
+ copyright notice, this list of conditions and the
+ following disclaimer.
+ .
+ * Redistributions in binary form must reproduce the
+ above copyright notice, this list of conditions and the
+ following disclaimer in the documentation and/or other
+ materials provided with the distribution.
+ .
+ * Neither the name of the organization nor the names of
+  its contributors may be used to endorse or promote
+  products derived from this software without specific
+  prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+ CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+Files: audio/mods/paula.cpp
+Copyright: 1995, 1996, 1997 Bernd Schmidt
+           1996 Marcus Sundberg
+           1996 Manfred Thole
+           2006 Toni Wilen
+License: GPL-2
+
+Files: audio/softsynth/mt32/*
+Copyright: 2003-2006, 2008, 2009 Dean Beeler, Jerome Fisher
+           2011-2017 Dean Beeler, Jerome Fisher, Sergey V. Mikayev
+License: LGPL-2.1+
+
+Files: audio/softsynth/mt32/sha1/*
+Copyright: 2011 Micael Hildenborg
+License: BSD-3-clause-Hildenborg
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Micael Hildenborg nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY Micael Hildenborg ''AS IS'' AND ANY
+ EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL Micael Hildenborg BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Files: audio/softsynth/opl/nuked.*
+Copyright: 2013-2018 Alexey Khokholov (Nuke.YKT)
+License: GPL-2+
+
+Files: backends/platform/ds/arm9/source/fat/*
+Copyright: Michael Chisholm <chishm@hotmail.com>
+License: MC-custom
+ This software is completely free. No warranty is provided.
+ If you use it, please give me credit and email me about your
+ project at chishm@hotmail.com
+
+Files: backends/platform/ds/arm9/source/fat/io_m3_common.*
+       backends/platform/ds/arm9/source/fat/io_njsd.*
+       backends/platform/ds/arm9/source/fat/io_sd_*
+Copyright: 2006 Michael "Chishm" Chisholm
+License: BSD-3-clause-Chisholm
+ Redistribution and use in source and binary forms, with or without modification,
+ are permitted provided that the following conditions are met:
+ .
+  1. Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright notice,
+     this list of conditions and the following disclaimer in the documentation and/or
+     other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products derived
+     from this software without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Files: backends/platform/ds/arm9/source/interrupt.s
+       backends/platform/ds/arm9/source/keys.cpp
+Copyright: 2005 Dave Murphy (WinterMute)
+License: BSD-3-clause~dm
+ This software is provided 'as-is', without any express or implied
+ warranty.  In no event will the authors be held liable for any
+ damages arising from the use of this software.
+ .
+ Permission is granted to anyone to use this software for any
+ purpose, including commercial applications, and to alter it and
+ redistribute it freely, subject to the following restrictions:
+    1.      The origin of this software must not be misrepresented; you
+            must not claim that you wrote the original software. If you use
+            this software in a product, an acknowledgment in the product
+            documentation would be appreciated but is not required.
+    2.      Altered source versions must be plainly marked as such, and
+            must not be misrepresented as being the original software.
+    3.      This notice may not be removed or altered from any source
+            distribution.
+
+Files:
+    backends/platform/android/snprintf.cpp
+Copyright:
+    1995 Patrick Powell <papowell@astart.com>
+License: any-purpose-note
+ It may be used for any purpose as long as this notice remains intact on all
+ source code distributions.
+
+Files: engines/director/lingo/tests/Lingo?bytecode.html
+Copyright: 2001-2017, MediaWiki developers
+License: GPL-2+ and CC-0
+Comment:
+ Downloaded from
+ <http://fileformats.archiveteam.org/wiki/Lingo_bytecode>
+
+Files:
+    engines/pegasus/interaction.cpp
+Copyright:
+    2001-2020 The ScummVM Team
+    1995-1997 Presto Studios, Inc.
+License: GPL-2+
+
+Files: common/json.cpp
+Copyright: 2008-2009 Bjoern Hoehrmann
+License: Expat
+
+Files: common/safe-bool.h
+Copyright: Boost project contributors
+License: Boost-1.0
+ Permission is hereby granted, free of charge, to any person or organization
+ obtaining a copy of the software and accompanying documentation covered by
+ this license (the "Software") to use, reproduce, display, distribute,
+ execute, and transmit the Software, and to prepare derivative works of the
+ Software, and to permit third-parties to whom the Software is furnished to
+ do so, all subject to the following:
+ .
+ The copyright notices in the Software and this entire statement, including
+ the above license grant, this restriction and the following disclaimer,
+ must be included in all copies of the Software, in whole or in part, and
+ all derivative works of the Software, unless such copies or derivative
+ works are solely in the form of machine-executable object code generated by
+ a source language processor.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+ SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+ FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+
+Files: common/lua/*
+Copyright: 1994-2008 Lua.org, PUC-Rio.
+License: Expat
+
+Files:
+    common/lua/double_*
+    common/lua/scummvm_*
+Copyright:
+    2001-2020 The ScummVM Team
+License: GPL-2+
+
+Files: common/lua/lua_*
+Copyright:
+    2001-2020 The ScummVM Team
+    2004      Ben Sunshine-Hill
+License: GPL-2+
+Comment:
+ This code is heavily based on the Pluto code base.
+ Copyright (C) 2004 by Ben Sunshine-Hill, and released into the public
+ domain. People making use of this software as part of an application
+ are politely requested to email the author at sneftel@gmail.com
+ with a brief description of the application, primarily to satisfy his
+ curiosity.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Files: devtools/create_bladerunner/subtitles/fontCreator/grabberFromPNG17BR.py
+Copyright: 2018 anoniou
+License: Expat
+
+Files: engines/adl/display_a2.cpp
+Copyright: 2010-2011 William S Simms
+           2014-2016 Michael Pohoreski, Tom Charlesworth
+License: GPL-2+
+
+Files: engines/glk/alan3/fnmatch.*
+Copyright: ScummVM developers
+           1989, 1993, 1994 The Regents of the University of California
+License: GPL-2+ and BSD-3-clause-UCB
+
+Files: engines/wintermute/utils/crc.*
+Copyright: 2000 Michael Barr
+License: public-domain-crc
+ This software is placed into
+ the public domain and may be used for any purpose. However, this
+ notice must not be changed or removed and no warranty is either
+ expressed or implied by its publication or distribution.
+
+Files:
+    engines/wage/combat.cpp
+    engines/wage/design.cpp
+    engines/wage/design.h
+    engines/wage/dialog.cpp
+    engines/wage/dialog.h
+    engines/wage/entities.cpp
+    engines/wage/entities.h
+    engines/wage/gui.cpp
+    engines/wage/gui.h
+    engines/wage/randomhat.cpp
+    engines/wage/randomhat.h
+    engines/wage/saveload.cpp
+    engines/wage/script.cpp
+    engines/wage/script.h
+    engines/wage/sound.cpp
+    engines/wage/sound.h
+    engines/wage/util.cpp
+    engines/wage/wage.cpp
+    engines/wage/wage.h
+    engines/wage/world.cpp
+    engines/wage/world.h
+Copyright:
+    2001-2016 The ScummVM Project
+    2009      Alexei Svitkine, Eugene Sandulenko
+License: GPL-2+ and Expat
+
+Files: engines/wintermute/base/file/base_savefile_manager_file.*
+       engines/wintermute/base/scriptables/script_ext_directory.*
+Copyright: 2011 Jan Nedoma
+License: Expat
+
+Files:
+    graphics/nine_patch.cpp
+    graphics/nine_patch.h
+Copyright:
+    2001-2016 The ScummVM Project
+    2011      Matthew Leverton
+License: GPL-2+ and Expat
+
+Files:
+    gui/themes/fonts/Free*.ttf
+Copyright: 2002-2009 Free Software Foundation.
+License: GPL-3+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3, or (at your option)
+ any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ The complete text of the GNU General Public License can be found
+ in "/usr/share/common-licenses/GPL-3".
+
+Files: gui/themes/fonts/clR6x12*.bdf
+Copyright: 1989 Dale Schumacher <dal@syntel.mn.org>
+License: MIT-like
+ Permission to use, copy, modify, and distribute this software and
+ its documentation for any purpose and without fee is hereby
+ granted, provided that the above copyright notice appear in all
+ copies and that both that copyright notice and this permission
+ notice appear in supporting documentation, and that the name of
+ Dale Schumacher not be used in advertising or publicity pertaining to
+ distribution of the software without specific, written prior
+ permission.  Dale Schumacher makes no representations about the
+ suitability of this software for any purpose.  It is provided "as
+ is" without express or implied warranty.
+
+Files: gui/themes/fonts/fixed5x8*.bdf
+Copyright: not-applicable
+License: public-domain
+ Public domain font.  Share and enjoy.
+
+Files: gui/themes/fonts/helv*.bdf
+Copyright: 1984-1989,1994 Adobe Systems Incorporated.
+           1988,1994      Digital Equipment Corporation.
+License: MIT-Adobe-DEC
+ Adobe is a trademark of Adobe Systems Incorporated which may be
+ registered in certain jurisdictions.
+ Permission to use these trademarks is hereby granted only in
+ association with the images described in this file.
+ .
+ Permission to use, copy, modify, distribute and sell this software
+ and its documentation for any purpose and without fee is hereby
+ granted, provided that the above copyright notices appear in all
+ copies and that both those copyright notices and this permission
+ notice appear in supporting documentation, and that the names of
+ Adobe Systems and Digital Equipment Corporation not be used in
+ advertising or publicity pertaining to distribution of the software
+ without specific, written prior permission.  Adobe Systems and
+ Digital Equipment Corporation make no representations about the
+ suitability of this software for any purpose.  It is provided "as
+ is" without express or implied warranty.
+
+Files: graphics/yuv_to_rgb.cpp
+Copyright: 2001-2012 The ScummVM Project
+License: GPL-2+
+Comment: portions copyright as below
+ The YUV to RGB conversion code is derived from SDL's YUV overlay code, which
+ in turn appears to be derived from mpeg_play. The following copyright
+ notices have been included in accordance with the original license. Please
+ note that the term "software" in this context only applies to the
+ buildLookup() and plotYUV*() functions below.
+ .
+ Copyright (c) 1995 The Regents of the University of California.
+ All rights reserved.
+ .
+ Permission to use, copy, modify, and distribute this software and its
+ documentation for any purpose, without fee, and without written agreement is
+ hereby granted, provided that the above copyright notice and the following
+ two paragraphs appear in all copies of this software.
+ .
+ IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
+ DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+ OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY OF
+ CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ .
+ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
+ ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO
+ PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ .
+ Copyright (c) 1995 Erik Corry
+ All rights reserved.
+ .
+ Permission to use, copy, modify, and distribute this software and its
+ documentation for any purpose, without fee, and without written agreement is
+ hereby granted, provided that the above copyright notice and the following
+ two paragraphs appear in all copies of this software.
+ .
+ IN NO EVENT SHALL ERIK CORRY BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+ SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF
+ THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF ERIK CORRY HAS BEEN ADVISED
+ OF THE POSSIBILITY OF SUCH DAMAGE.
+ .
+ ERIK CORRY SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS"
+ BASIS, AND ERIK CORRY HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
+ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ .
+ Portions of this software Copyright (c) 1995 Brown University.
+ All rights reserved.
+ .
+ Permission to use, copy, modify, and distribute this software and its
+ documentation for any purpose, without fee, and without written agreement
+ is hereby granted, provided that the above copyright notice and the
+ following two paragraphs appear in all copies of this software.
+ .
+ IN NO EVENT SHALL BROWN UNIVERSITY BE LIABLE TO ANY PARTY FOR
+ DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+ OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF BROWN
+ UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ .
+ BROWN UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS"
+ BASIS, AND BROWN UNIVERSITY HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+Files: test/cxxtest/*
+Copyright: 2008 Sandia Corporation
+License: LGPL-2.1+
+
+Files: debian/*
+Copyright: 2002            Bastien Nocera <hadess@hadess.net>
+           2003,2006-2008  David Weinehall <tao@debian.org>
+           2012-2020       Dmitry Smirnov <onlyjob@debian.org>
+           2009-2012       Moritz Muehlenhoff <jmm@debian.org>
+           2018-2019       Stephen Kitt <skitt@debian.org>
+           2002-2005       Tore Anderson <tore@linpro.no>
+License: GPL-2+
+
+License: GPL-2
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License, version 2, as
+ published by the Free Software Foundation.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ The complete text of the GNU General Public License version 2
+ can be found in `/usr/share/common-licenses/GPL-2'.
+
+License: GPL-2+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ The complete text of the GNU General Public License version 2
+ can be found in `/usr/share/common-licenses/GPL-2'.
+
+License: LGPL-2.1+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ .
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ .
+ On Debian systems, the complete text of the GNU Library General Public License
+ can be found in the file `/usr/share/common-licenses/LGPL-2.1'.
+
+License: Expat
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+Comment:
+ This license also known as "MIT/X11 (BSD like)" or "MIT" however FSF
+ consider "MIT" labelling ambiguous and copyright-format specification
+ recommend to label such license as "Expat".
+
+License: CC-0
+ Statement of Purpose
+ .
+ The laws of most jurisdictions throughout the world automatically
+ confer exclusive Copyright and Related Rights (defined below) upon
+ the creator and subsequent owner(s) (each and all, an "owner") of an
+ original work of authorship and/or a database (each, a "Work").
+ .
+ Certain owners wish to permanently relinquish those rights to a Work
+ for the purpose of contributing to a commons of creative, cultural
+ and scientific works ("Commons") that the public can reliably and
+ without fear of later claims of infringement build upon, modify,
+ incorporate in other works, reuse and redistribute as freely as
+ possible in any form whatsoever and for any purposes, including
+ without limitation commercial purposes. These owners may contribute
+ to the Commons to promote the ideal of a free culture and the further
+ production of creative, cultural and scientific works, or to gain
+ reputation or greater distribution for their Work in part through the
+ use and efforts of others.
+ .
+ For these and/or other purposes and motivations, and without any
+ expectation of additional consideration or compensation, the person
+ associating CC0 with a Work (the "Affirmer"), to the extent that he
+ or she is an owner of Copyright and Related Rights in the Work,
+ voluntarily elects to apply CC0 to the Work and publicly distribute
+ the Work under its terms, with knowledge of his or her Copyright and
+ Related Rights in the Work and the meaning and intended legal effect
+ of CC0 on those rights.
+ .
+ 1. Copyright and Related Rights. A Work made available under CC0 may
+    be protected by copyright and related or neighboring rights
+    ("Copyright and Related Rights"). Copyright and Related Rights
+    include, but are not limited to, the following:
+ .
+      i. the right to reproduce, adapt, distribute, perform, display,
+         communicate, and translate a Work;
+     ii. moral rights retained by the original author(s) and/or
+         performer(s);
+    iii. publicity and privacy rights pertaining to a person's image
+         or likeness depicted in a Work;
+     iv. rights protecting against unfair competition in regards to a
+         Work, subject to the limitations in paragraph 4(a), below;
+      v. rights protecting the extraction, dissemination, use and
+         reuse of data in a Work;
+     vi. database rights (such as those arising under Directive
+         96/9/EC of the European Parliament and of the Council of 11
+         March 1996 on the legal protection of databases, and under
+         any national implementation thereof, including any amended or
+         successor version of such directive); and
+    vii. other similar, equivalent or corresponding rights throughout
+         the world based on applicable law or treaty, and any national
+         implementations thereof.
+ .
+ 2. Waiver. To the greatest extent permitted by, but not in
+    contravention of, applicable law, Affirmer hereby overtly, fully,
+    permanently, irrevocably and unconditionally waives, abandons, and
+    surrenders all of Affirmer's Copyright and Related Rights and
+    associated claims and causes of action, whether now known or
+    unknown (including existing as well as future claims and causes of
+    action), in the Work (i) in all territories worldwide, (ii) for
+    the maximum duration provided by applicable law or treaty
+    (including future time extensions), (iii) in any current or future
+    medium and for any number of copies, and (iv) for any purpose
+    whatsoever, including without limitation commercial, advertising
+    or promotional purposes (the "Waiver"). Affirmer makes the Waiver
+    for the benefit of each member of the public at large and to the
+    detriment of Affirmer's heirs and successors, fully intending that
+    such Waiver shall not be subject to revocation, rescission,
+    cancellation, termination, or any other legal or equitable action
+    to disrupt the quiet enjoyment of the Work by the public as
+    contemplated by Affirmer's express Statement of Purpose.
+ .
+ 3. Public License Fallback. Should any part of the Waiver for any
+ reason be judged legally invalid or ineffective under applicable law,
+ then the Waiver shall be preserved to the maximum extent permitted
+ taking into account Affirmer's express Statement of Purpose. In
+ addition, to the extent the Waiver is so judged Affirmer hereby
+ grants to each affected person a royalty-free, non transferable, non
+ sublicensable, non exclusive, irrevocable and unconditional license
+ to exercise Affirmer's Copyright and Related Rights in the Work (i)
+ in all territories worldwide, (ii) for the maximum duration provided
+ by applicable law or treaty (including future time extensions), (iii)
+ in any current or future medium and for any number of copies, and
+ (iv) for any purpose whatsoever, including without limitation
+ commercial, advertising or promotional purposes (the "License"). The
+ License shall be deemed effective as of the date CC0 was applied by
+ Affirmer to the Work. Should any part of the License for any reason
+ be judged legally invalid or ineffective under applicable law, such
+ partial invalidity or ineffectiveness shall not invalidate the
+ remainder of the License, and in such case Affirmer hereby affirms
+ that he or she will not (i) exercise any of his or her remaining
+ Copyright and Related Rights in the Work or (ii) assert any
+ associated claims and causes of action with respect to the Work, in
+ either case contrary to Affirmer's express Statement of Purpose.
+ .
+ 4. Limitations and Disclaimers.
+ .
+      a. No trademark or patent rights held by Affirmer are waived,
+         abandoned, surrendered, licensed or otherwise affected by
+         this document.
+      b. Affirmer offers the Work as-is and makes no representations
+         or warranties of any kind concerning the Work, express,
+         implied, statutory or otherwise, including without limitation
+         warranties of title, merchantability, fitness for a
+         particular purpose, non infringement, or the absence of
+         latent or other defects, accuracy, or the present or absence
+         of errors, whether or not discoverable, all to the greatest
+         extent permissible under applicable law.
+      c. Affirmer disclaims responsibility for clearing rights of
+         other persons that may apply to the Work or any use thereof,
+         including without limitation any person's Copyright and
+         Related Rights in the Work. Further, Affirmer disclaims
+         responsibility for obtaining any necessary consents,
+         permissions or other rights required for any use of the
+         Work.
+      d. Affirmer understands and acknowledges that Creative Commons
+         is not a party to this document and has no duty or obligation
+         with respect to this CC0 or use of the Work.
+
+License: BSD-3-clause-UCB
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 4. Neither the name of the University nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ SUCH DAMAGE.

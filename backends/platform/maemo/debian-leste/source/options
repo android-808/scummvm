@@ -1,0 +1,2 @@
+# ignore changes on replaced (unbundled) fonts
+extend-diff-ignore = "(^|/)gui/themes/fonts/[^/]+\.ttf$"

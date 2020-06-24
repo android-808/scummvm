@@ -1,0 +1,38 @@
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=946888
+Description: backport upstream git fixes for build with new fluidsynth
+# https://github.com/scummvm/scummvm/commit/68758a87
+# https://github.com/scummvm/scummvm/commit/8593a9e1
+
+--- a/audio/softsynth/fluidsynth.cpp
++++ b/audio/softsynth/fluidsynth.cpp
+@@ -19,12 +19,18 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+  *
+  */
+ 
+-#include "common/scummsys.h"
++#include "config.h"
+ 
+ #ifdef USE_FLUIDSYNTH
+ 
++// Fluidsynth v2.1+ uses printf in one of it's headers,
++// include/fluidsynth/log.h around line 82 so need to include this
++// prior scummsys.h inclusion and thus forbidden.h
++#include <fluidsynth.h>
++
++#include "common/scummsys.h"
+ #include "common/config-manager.h"
+ #include "common/error.h"
+ #include "common/system.h"
+ #include "common/textconsole.h"
+@@ -34,10 +40,8 @@
+ #if defined(IPHONE_IOS7) && defined(IPHONE_SANDBOXED)
+ #include "backends/platform/ios7/ios7_common.h"
+ #endif
+ 
+-#include <fluidsynth.h>
+-
+ class MidiDriver_FluidSynth : public MidiDriver_Emulated {
+ private:
+ 	MidiChannel_MPU401 _midiChannels[16];
+ 	fluid_settings_t *_settings;
